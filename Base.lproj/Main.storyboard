@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BPT-zd-A8e">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9060" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BPT-zd-A8e">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -20,7 +20,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="w9R-aC-jwt"/>
                     <connections>
-                        <segue destination="2kb-8I-fb7" kind="presentation" identifier="signUpPage" id="bMs-tX-ics"/>
+                        <segue destination="Mq4-Ii-5Ne" kind="presentation" identifier="signUpPage" id="bMs-tX-ics"/>
                         <segue destination="qMm-e1-tTw" kind="presentation" identifier="signInPage" id="Q8c-U5-agP"/>
                     </connections>
                 </viewController>
@@ -89,7 +89,7 @@
             </objects>
             <point key="canvasLocation" x="1929" y="-69"/>
         </scene>
-        <!--Sign Up View Controller-->
+        <!--farmers->to->families-->
         <scene sceneID="jyF-XW-aSU">
             <objects>
                 <viewController id="2kb-8I-fb7" customClass="SignUpViewController" customModule="LocalFarming" customModuleProvider="target" sceneMemberID="viewController">
@@ -102,7 +102,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Zb3-0m-rCV">
-                                <rect key="frame" x="20" y="28" width="560" height="552"/>
+                                <rect key="frame" x="20" y="72" width="560" height="508"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign Up using your e-mail" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iex-rD-9BS">
                                         <rect key="frame" x="8" y="8" width="544" height="21"/>
@@ -157,6 +157,7 @@
                                     <constraint firstItem="b5c-QK-Jyq" firstAttribute="top" secondItem="mxK-dt-i8a" secondAttribute="bottom" constant="8" id="avE-H2-xPo"/>
                                     <constraint firstItem="FhU-xr-0Ux" firstAttribute="top" secondItem="Iex-rD-9BS" secondAttribute="bottom" constant="8" id="bQu-UE-TAa"/>
                                     <constraint firstAttribute="trailing" secondItem="aJW-do-h6c" secondAttribute="trailing" constant="8" id="haa-of-6tM"/>
+                                    <constraint firstItem="Iex-rD-9BS" firstAttribute="top" secondItem="Zb3-0m-rCV" secondAttribute="top" constant="8" id="jHS-pq-sAS"/>
                                     <constraint firstItem="Zlc-lI-VQO" firstAttribute="top" secondItem="b5c-QK-Jyq" secondAttribute="bottom" constant="8" id="kbu-sa-0U5"/>
                                     <constraint firstItem="b5c-QK-Jyq" firstAttribute="top" secondItem="mxK-dt-i8a" secondAttribute="bottom" constant="-1" id="lX9-2z-SOI"/>
                                     <constraint firstItem="Ggx-Se-qAH" firstAttribute="top" secondItem="aJW-do-h6c" secondAttribute="bottom" constant="49" id="oxW-XD-WkE"/>
@@ -178,7 +179,6 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Iex-rD-9BS" firstAttribute="top" secondItem="HvE-5d-K0n" secondAttribute="bottom" constant="16" id="0hv-c1-G9O"/>
                             <constraint firstItem="Iex-rD-9BS" firstAttribute="leading" secondItem="bWu-ro-EqC" secondAttribute="leadingMargin" constant="8" id="PRD-Aq-4vX"/>
                             <constraint firstAttribute="leadingMargin" secondItem="Zb3-0m-rCV" secondAttribute="leading" id="Pqy-VI-WqG"/>
                             <constraint firstItem="FhU-xr-0Ux" firstAttribute="leading" secondItem="bWu-ro-EqC" secondAttribute="leadingMargin" constant="8" id="SCk-un-7jW"/>
@@ -190,6 +190,13 @@
                             <constraint firstAttribute="trailingMargin" secondItem="Iex-rD-9BS" secondAttribute="trailing" constant="8" id="wRw-3n-evg"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="farmers-&gt;to-&gt;families" id="8zR-DN-JCI">
+                        <barButtonItem key="leftBarButtonItem" title="Cancel" id="V6U-RZ-7EA">
+                            <connections>
+                                <action selector="dismissAttempt:" destination="2kb-8I-fb7" id="FJe-I7-Vpe"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="emailTextField" destination="b5c-QK-Jyq" id="GUl-ez-PCE"/>
                         <outlet property="firstNameTextField" destination="FhU-xr-0Ux" id="8tA-eu-RaZ"/>
@@ -201,7 +208,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PUS-EN-TXO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1929" y="607"/>
+            <point key="canvasLocation" x="2741" y="607"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="9oz-Pt-bfq">
@@ -220,6 +227,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TBS-Kv-V9b" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="340" y="239"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="b2B-uy-g15">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Mq4-Ii-5Ne" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="fZg-Ph-wg6">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="2kb-8I-fb7" kind="relationship" relationship="rootViewController" id="sSO-oN-A6h"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ECw-hc-PCr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1929" y="607"/>
         </scene>
     </scenes>
 </document>

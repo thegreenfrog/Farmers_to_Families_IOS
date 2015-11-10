@@ -8,7 +8,11 @@
 
 import UIKit
 
-class SignUpViewController: UIViewController, UITextViewDelegate {
+class SignUpViewController: UIViewController, UITextFieldDelegate {
+    
+    @IBAction func dismissAttempt(sender: UIBarButtonItem) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
 
     @IBOutlet weak var firstNameTextField: UITextField!
     @IBOutlet weak var lastNameTextField: UITextField!
@@ -47,17 +51,41 @@ class SignUpViewController: UIViewController, UITextViewDelegate {
         
         //submit user or post error message
         if errorMessages.count > 0 {
-            let errorOrigin = CGPoint(x: signupButton.layer.bounds.origin.x, y: signupButton.layer.bounds.origin.y + (Constants.errorMessageProportionHeight / 2) * CGFloat(errorMessages.count))
-            let frame = CGRect(origin: errorOrigin, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)))
-            let errorLabel = UILabel(frame: frame)
-            let count = 0
+            let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)))
+            let errorSubView = UIView(frame: frame)
+            errorSubView.center.x = signupButton.center.x
+            errorSubView.center.y = signupButton.center.y + Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)
+            errorSubView.layer.borderColor = UIColor.redColor().CGColor
+            errorSubView.layer.borderWidth = Constants.errorBorderWidth
+            var count = 0
             for error in errorMessages {
-                if count == 0{
-                    errorLabel.text = error
-                }
-                errorLabel.text! += error
+                let labelOrigin = CGPoint(x: errorSubView.layer.bounds.origin.x, y: errorSubView.layer.bounds.origin.y + Constants.errorMessageProportionHeight * CGFloat(count))
+                let errorFrame = CGRect(origin: labelOrigin, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight))
+                let label = UILabel(frame: errorFrame)
+                label.text = error
+                label.lineBreakMode = NSLineBreakMode.ByWordWrapping
+                label.font = UIFont(name: label.font.fontName, size: 10)
+                errorSubView.addSubview(label)
+                count++
             }
-            //self.view.addSubview(errorLabel)
+            self.view.addSubview(errorSubView)
+            
+        } else {
+            //attempt to log in
+            let user = PFUser()
+            user.username = emailTextField.text
+            user.email = emailTextField.text
+            user.password = passwordTextField.text
+            user["firstName"] = firstNameTextField.text
+            user["lastName"] = lastNameTextField.text
+            user.signUpInBackgroundWithBlock({
+                (succeeded: Bool, error: NSError?) -> Void in
+                if let error = error {
+                    let errorString = error.userInfo["error"] as? NSString
+                } else {
+                    
+                }
+            })
         }
         
         //clear all so no left over for next sign up attempt
@@ -91,6 +119,11 @@ class SignUpViewController: UIViewController, UITextViewDelegate {
         emailTextField.textColor = UIColor.lightGrayColor()
         passwordTextField.textColor = UIColor.lightGrayColor()
         retypePassTextField.textColor = UIColor.lightGrayColor()
+        self.firstNameTextField.delegate = self
+        self.lastNameTextField.delegate = self
+        self.emailTextField.delegate = self
+        self.passwordTextField.delegate = self
+        self.retypePassTextField.delegate = self
         
     }
 
@@ -99,19 +132,17 @@ class SignUpViewController: UIViewController, UITextViewDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    func textViewDidBeginEditing(textView: UITextView) {
-        if textView.textColor == UIColor.lightGrayColor() {
-            textView.text = nil
-            textView.textColor = UIColor.blackColor()
+    func textFieldDidBeginEditing(textField: UITextField) {
+        if textField.textColor == UIColor.lightGrayColor() {
+            textField.text = nil
+            textField.textColor = UIColor.blackColor()
         }
     }
     
-    func textViewDidEndEditing(textView: UITextView) {
-        
-        if textView.text.isEmpty {
-            textView.text = "Placeholder"
-            textView.textColor = UIColor.lightGrayColor()
+    func textFieldDidEndEditing(textField: UITextField) {
+        if textField.text!.isEmpty {
+            textField.text = "Placeholder"
+            textField.textColor = UIColor.lightGrayColor()
         }
     }
     
