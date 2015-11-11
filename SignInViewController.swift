@@ -8,24 +8,132 @@
 
 import UIKit
 
-class SignInViewController: UIViewController {
+class SignInViewController: UIViewController, UITextFieldDelegate {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    // MARK: - Outlets and Variables
+    
+    struct Constants {
+        static let noemail = "Please enter your username"
+        static let noPassword = "Please enter your password"
+        
+        static let errorBorderWidth:CGFloat = 1.0
+        static let errorMessageProportionHeight:CGFloat = 20.0
+        static let errorMessageWidth:CGFloat = 200.0
     }
     
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
+    
+    @IBOutlet weak var signUpButton: UIButton!
+    
+    let placeholders = ["Username (email)", "Password"]
+    var errorMessages = [String]()
+    
+    
+    // MARK: - Life Cycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        emailTextField.tag = 0
+        emailTextField.text = placeholders[emailTextField.tag]
+        emailTextField.textColor = UIColor.lightGrayColor()
+        emailTextField.delegate = self
+        passwordTextField.tag = 1
+        passwordTextField.text = placeholders[passwordTextField.tag]
+        passwordTextField.textColor = UIColor.lightGrayColor()
+        passwordTextField.delegate = self
+        
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        view.addGestureRecognizer(tap)
+    }
 
-    @IBAction func signinButton(sender: UIButton) {
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        
+    }
+    
+    
+    // MARK: - Storyboard UI Functions
+    
+    func textFieldDidBeginEditing(textField: UITextField) {
+        if textField.textColor == UIColor.lightGrayColor() {
+            textField.text = nil
+            textField.textColor = UIColor.blackColor()
+        }
+        textField.becomeFirstResponder()
+    }
+    
+    func textFieldDidEndEditing(textField: UITextField) {
+        if textField.text!.isEmpty {
+            textField.text = placeholders[textField.tag]
+            textField.textColor = UIColor.lightGrayColor()
+        }
+        textField.resignFirstResponder()
+    }
+    
+    func dismissKeyboard() {
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
+    }
+    
+    
+    // MARK: - User Actions
+    
+    @IBAction func signUpButton(sender: UIButton) {
         performSegueWithIdentifier("signUpModal", sender: self)
+    }
+    
+    @IBAction func signInButton(sender: UIButton) {
+        emailTextField.layer.borderWidth = 0.0
+        passwordTextField.layer.borderWidth = 0.0
+        
+        if emailTextField.textColor == UIColor.lightGrayColor() {
+            errorMessages.append(Constants.noemail)
+            emailTextField.layer.borderColor = UIColor.redColor().CGColor
+            emailTextField.layer.borderWidth = Constants.errorBorderWidth
+        } else if passwordTextField.textColor == UIColor.lightGrayColor() {
+            errorMessages.append(Constants.noPassword)
+            passwordTextField.layer.borderColor = UIColor.redColor().CGColor
+            passwordTextField.layer.borderWidth = Constants.errorBorderWidth
+        }
+        
+        if(errorMessages.count > 0) {
+            handleErrors()
+        } else {
+            PFUser.logInWithUsernameInBackground(emailTextField.text!, password: passwordTextField.text!) {
+                (user: PFUser?, error: NSError?) -> Void in
+                if user != nil {
+                    if let error = error {
+                        self.errorMessages.append(error.localizedDescription)
+                        self.handleErrors()
+                    }
+                } else {
+                    // The login failed
+                    
+                }
+            }
+        }
+    }
+    
+    func handleErrors() {
+        let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)))
+        let errorSubView = UIView(frame: frame)
+        errorSubView.center.x = signUpButton.center.x
+        errorSubView.center.y = signUpButton.center.y + Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)
+        errorSubView.layer.borderColor = UIColor.redColor().CGColor
+        errorSubView.layer.borderWidth = Constants.errorBorderWidth
+        var count = 0
+        for error in errorMessages {
+            let labelOrigin = CGPoint(x: errorSubView.layer.bounds.origin.x, y: errorSubView.layer.bounds.origin.y + Constants.errorMessageProportionHeight * CGFloat(count))
+            let errorFrame = CGRect(origin: labelOrigin, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight))
+            let label = UILabel(frame: errorFrame)
+            label.text = error
+            label.lineBreakMode = NSLineBreakMode.ByWordWrapping
+            label.font = UIFont(name: label.font.fontName, size: 10)
+            errorSubView.addSubview(label)
+            count++
+        }
+        self.view.addSubview(errorSubView)
     }
     
     @IBAction func cancelAction(sender: UIBarButtonItem) {

@@ -10,9 +10,7 @@ import UIKit
 
 class SignUpViewController: UIViewController, UITextFieldDelegate {
     
-    @IBAction func dismissAttempt(sender: UIBarButtonItem) {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
+    // MARK: - Constants and Variables
 
     @IBOutlet weak var firstNameTextField: UITextField!
     @IBOutlet weak var lastNameTextField: UITextField!
@@ -20,6 +18,87 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var retypePassTextField: UITextField!
     @IBOutlet weak var signupButton: UIButton!
+    
+    struct Constants {
+        static let noFirstName = "Please enter your first name"
+        static let noLastName = "Please enter your last name"
+        static let noemail = "Please enter your email address"
+        static let noPassword = "Please enter a password with at least 6 characters"
+        static let noretypePassword = "Please re-enter the same password"
+        
+        static let errorBorderWidth:CGFloat = 1.0
+        static let errorMessageProportionHeight:CGFloat = 20.0
+        static let errorMessageWidth:CGFloat = 200.0
+    }
+    
+    let placeholders = ["First Name","Last Name", "Email Address", "Enter Password (at least 6 characters)", "re-Enter Password"]
+    var errorMessages = [String]()
+    
+    // MARK: - Life Cycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        firstNameTextField.tag = 0
+        lastNameTextField.tag = 1
+        emailTextField.tag = 2
+        passwordTextField.tag = 3
+        retypePassTextField.tag = 4
+        firstNameTextField.text = placeholders[firstNameTextField.tag]
+        lastNameTextField.text = placeholders[lastNameTextField.tag]
+        emailTextField.text = placeholders[emailTextField.tag]
+        passwordTextField.text = placeholders[passwordTextField.tag]
+        retypePassTextField.text = placeholders[retypePassTextField.tag]
+        firstNameTextField.textColor = UIColor.lightGrayColor()
+        lastNameTextField.textColor = UIColor.lightGrayColor()
+        emailTextField.textColor = UIColor.lightGrayColor()
+        passwordTextField.textColor = UIColor.lightGrayColor()
+        retypePassTextField.textColor = UIColor.lightGrayColor()
+        self.firstNameTextField.delegate = self
+        self.lastNameTextField.delegate = self
+        self.emailTextField.delegate = self
+        self.passwordTextField.delegate = self
+        self.retypePassTextField.delegate = self
+        
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        view.addGestureRecognizer(tap)
+    }
+
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    // MARK: - Storyboard UI Functions
+    
+    func textFieldDidBeginEditing(textField: UITextField) {
+        if textField.textColor == UIColor.lightGrayColor() {
+            textField.text = nil
+            textField.textColor = UIColor.blackColor()
+        }
+        textField.becomeFirstResponder()
+    }
+    
+    func textFieldDidEndEditing(textField: UITextField) {
+        if textField.text!.isEmpty {
+            textField.text = "Placeholder"
+            textField.textColor = UIColor.lightGrayColor()
+        }
+        textField.resignFirstResponder()
+    }
+    
+    func dismissKeyboard() {
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
+    }
+    
+    
+    // MARK: - User Actions
+    
+    @IBAction func dismissAttempt(sender: UIBarButtonItem) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
     
     @IBAction func signupButton(sender: UIButton) {
         //make sure inputs are filled in properly
@@ -51,112 +130,53 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         
         //submit user or post error message
         if errorMessages.count > 0 {
-            let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)))
-            let errorSubView = UIView(frame: frame)
-            errorSubView.center.x = signupButton.center.x
-            errorSubView.center.y = signupButton.center.y + Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)
-            errorSubView.layer.borderColor = UIColor.redColor().CGColor
-            errorSubView.layer.borderWidth = Constants.errorBorderWidth
-            var count = 0
-            for error in errorMessages {
-                let labelOrigin = CGPoint(x: errorSubView.layer.bounds.origin.x, y: errorSubView.layer.bounds.origin.y + Constants.errorMessageProportionHeight * CGFloat(count))
-                let errorFrame = CGRect(origin: labelOrigin, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight))
-                let label = UILabel(frame: errorFrame)
-                label.text = error
-                label.lineBreakMode = NSLineBreakMode.ByWordWrapping
-                label.font = UIFont(name: label.font.fontName, size: 10)
-                errorSubView.addSubview(label)
-                count++
-            }
-            self.view.addSubview(errorSubView)
-            
+            handleErrors()
         } else {
             //attempt to log in
             self.performSegueWithIdentifier("goBacktoProfile", sender: self)
-//            let user = PFUser()
-//            user.username = emailTextField.text
-//            user.email = emailTextField.text
-//            user.password = passwordTextField.text
-//            user["firstName"] = firstNameTextField.text
-//            user["lastName"] = lastNameTextField.text
-//            user.signUpInBackgroundWithBlock({
-//                (succeeded: Bool, error: NSError?) -> Void in
-//                if let error = error {
-//                    let errorString = error.userInfo["error"] as? NSString
-//                } else {
-//                    self.performSegueWithIdentifier("goBacktoProfile", sender: self)
-//                }
-//            })
+            //            let user = PFUser()
+            //            user.username = emailTextField.text
+            //            user.email = emailTextField.text
+            //            user.password = passwordTextField.text
+            //            user["firstName"] = firstNameTextField.text
+            //            user["lastName"] = lastNameTextField.text
+            //            user.signUpInBackgroundWithBlock({
+            //                (succeeded: Bool, error: NSError?) -> Void in
+            //                if let error = error {
+            //                    let errorString = error.userInfo["error"] as? NSString
+//                                self.errorMessages.append(errorString)
+//                                handleErrors()
+            //                } else {
+            //                    self.performSegueWithIdentifier("goBacktoProfile", sender: self)
+            //                }
+            //            })
         }
         
         //clear all so no left over for next sign up attempt
         errorMessages.removeAll()
     }
-    
-    struct Constants {
-        static let noFirstName = "Please enter your first name"
-        static let noLastName = "Please enter your last name"
-        static let noemail = "Please enter your email address"
-        static let noPassword = "Please enter a password with at least 6 characters"
-        static let noretypePassword = "Please re-enter the same password"
-        
-        static let errorBorderWidth:CGFloat = 1.0
-        static let errorMessageProportionHeight:CGFloat = 20.0
-        static let errorMessageWidth:CGFloat = 200.0
-    }
-    
-    var errorMessages = [String]()
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        firstNameTextField.text = "First Name"
-        lastNameTextField.text = "Last Name"
-        emailTextField.text = "Email Address"
-        passwordTextField.text = "Enter Password (at least 6 characters)"
-        retypePassTextField.text = "re-Enter Password"
-        firstNameTextField.textColor = UIColor.lightGrayColor()
-        lastNameTextField.textColor = UIColor.lightGrayColor()
-        emailTextField.textColor = UIColor.lightGrayColor()
-        passwordTextField.textColor = UIColor.lightGrayColor()
-        retypePassTextField.textColor = UIColor.lightGrayColor()
-        self.firstNameTextField.delegate = self
-        self.lastNameTextField.delegate = self
-        self.emailTextField.delegate = self
-        self.passwordTextField.delegate = self
-        self.retypePassTextField.delegate = self
-        
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
-        view.addGestureRecognizer(tap)
-    }
 
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    func textFieldDidBeginEditing(textField: UITextField) {
-        if textField.textColor == UIColor.lightGrayColor() {
-            textField.text = nil
-            textField.textColor = UIColor.blackColor()
+    func handleErrors() {
+        let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)))
+        let errorSubView = UIView(frame: frame)
+        errorSubView.center.x = signupButton.center.x
+        errorSubView.center.y = signupButton.center.y + Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)
+        errorSubView.layer.borderColor = UIColor.redColor().CGColor
+        errorSubView.layer.borderWidth = Constants.errorBorderWidth
+        var count = 0
+        for error in errorMessages {
+            let labelOrigin = CGPoint(x: errorSubView.layer.bounds.origin.x, y: errorSubView.layer.bounds.origin.y + Constants.errorMessageProportionHeight * CGFloat(count))
+            let errorFrame = CGRect(origin: labelOrigin, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight))
+            let label = UILabel(frame: errorFrame)
+            label.text = error
+            label.lineBreakMode = NSLineBreakMode.ByWordWrapping
+            label.font = UIFont(name: label.font.fontName, size: 10)
+            errorSubView.addSubview(label)
+            count++
         }
-        if !textField.becomeFirstResponder() {
-            print("did not accept keyboard")
-        }
+        self.view.addSubview(errorSubView)
     }
     
-    func textFieldDidEndEditing(textField: UITextField) {
-        if textField.text!.isEmpty {
-            textField.text = "Placeholder"
-            textField.textColor = UIColor.lightGrayColor()
-        }
-        textField.resignFirstResponder()
-    }
-    
-    func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-        view.endEditing(true)
-    }
 
     
     // MARK: - Navigation
