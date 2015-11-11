@@ -40,16 +40,16 @@ class ProfileViewController: UIViewController {
             signInButton.addTarget(self, action: "signIn", forControlEvents: .TouchUpInside)
             self.view.addSubview(signInButton)
             
-                        let signUpButton = UIButton()
-                        signUpButton.setTitle(Constants.signUpTitle, forState: .Normal)
-                        signUpButton.frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.signInUpWidth, height: Constants.signInUpHeight))
-                        signUpButton.frame.origin.x = self.view.bounds.midX
-                        signUpButton.frame.origin.y = self.view.bounds.midY + Constants.signInVerticalSpacingFromCenter
-                        signUpButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
-                        signUpButton.backgroundColor = UIColor.blueColor()
-                        signUpButton.layer.cornerRadius = Constants.cornerRadius
-                        signUpButton.addTarget(self, action: "signUp", forControlEvents: .TouchUpInside)
-                        self.view.addSubview(signUpButton)
+//                        let signUpButton = UIButton()
+//                        signUpButton.setTitle(Constants.signUpTitle, forState: .Normal)
+//                        signUpButton.frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.signInUpWidth, height: Constants.signInUpHeight))
+//                        signUpButton.frame.origin.x = self.view.bounds.midX
+//                        signUpButton.frame.origin.y = self.view.bounds.midY + Constants.signInVerticalSpacingFromCenter
+//                        signUpButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+//                        signUpButton.backgroundColor = UIColor.blueColor()
+//                        signUpButton.layer.cornerRadius = Constants.cornerRadius
+//                        signUpButton.addTarget(self, action: "signUp", forControlEvents: .TouchUpInside)
+//                        self.view.addSubview(signUpButton)
             
         }
         // Do any additional setup after loading the view.
@@ -58,10 +58,6 @@ class ProfileViewController: UIViewController {
     override func viewDidAppear(animated: Bool) {
         //let timer = NSTimer.scheduledTimerWithTimeInterval(8.0, target: self, selector: "signIn", userInfo: nil, repeats: false)
         //signIn()
-    }
-    
-    func popUpSignIn() {
-        self.performSegueWithIdentifier("signInPage", sender: self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -75,6 +71,10 @@ class ProfileViewController: UIViewController {
     
     func signIn() {
         performSegueWithIdentifier(Constants.signInSegueID, sender: self)
+    }
+    
+    @IBAction func unwindToProfile(segue: UIStoryboardSegue) {
+        
     }
     
     

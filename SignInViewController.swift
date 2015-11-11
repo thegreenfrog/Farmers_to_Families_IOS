@@ -25,9 +25,12 @@ class SignInViewController: UIViewController {
     @IBOutlet weak var passwordTextField: UITextField!
 
     @IBAction func signinButton(sender: UIButton) {
-    
+        performSegueWithIdentifier("signUpModal", sender: self)
     }
     
+    @IBAction func cancelAction(sender: UIBarButtonItem) {
+        performSegueWithIdentifier("cancelFromSignIn", sender: self)
+    }
     /*
     // MARK: - Navigation
 

@@ -72,20 +72,21 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
             
         } else {
             //attempt to log in
-            let user = PFUser()
-            user.username = emailTextField.text
-            user.email = emailTextField.text
-            user.password = passwordTextField.text
-            user["firstName"] = firstNameTextField.text
-            user["lastName"] = lastNameTextField.text
-            user.signUpInBackgroundWithBlock({
-                (succeeded: Bool, error: NSError?) -> Void in
-                if let error = error {
-                    let errorString = error.userInfo["error"] as? NSString
-                } else {
-                    
-                }
-            })
+            self.performSegueWithIdentifier("goBacktoProfile", sender: self)
+//            let user = PFUser()
+//            user.username = emailTextField.text
+//            user.email = emailTextField.text
+//            user.password = passwordTextField.text
+//            user["firstName"] = firstNameTextField.text
+//            user["lastName"] = lastNameTextField.text
+//            user.signUpInBackgroundWithBlock({
+//                (succeeded: Bool, error: NSError?) -> Void in
+//                if let error = error {
+//                    let errorString = error.userInfo["error"] as? NSString
+//                } else {
+//                    self.performSegueWithIdentifier("goBacktoProfile", sender: self)
+//                }
+//            })
         }
         
         //clear all so no left over for next sign up attempt
@@ -125,6 +126,8 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         self.passwordTextField.delegate = self
         self.retypePassTextField.delegate = self
         
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        view.addGestureRecognizer(tap)
     }
 
 
@@ -137,6 +140,9 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
             textField.text = nil
             textField.textColor = UIColor.blackColor()
         }
+        if !textField.becomeFirstResponder() {
+            print("did not accept keyboard")
+        }
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
@@ -144,17 +150,21 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
             textField.text = "Placeholder"
             textField.textColor = UIColor.lightGrayColor()
         }
+        textField.resignFirstResponder()
     }
     
+    func dismissKeyboard() {
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
+    }
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
+//    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+//        
+//    }
+
 
 }
