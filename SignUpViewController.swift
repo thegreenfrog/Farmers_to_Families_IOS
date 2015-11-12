@@ -26,6 +26,8 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         static let noPassword = "Please enter a password with at least 6 characters"
         static let noretypePassword = "Please re-enter the same password"
         
+        static let emailRegex = "[^@]+[@][a-z0-9]+[.][a-z]*"
+        
         static let errorBorderWidth:CGFloat = 1.0
         static let errorMessageProportionHeight:CGFloat = 20.0
         static let errorMessageWidth:CGFloat = 200.0
@@ -112,7 +114,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
             lastNameTextField.layer.borderWidth = Constants.errorBorderWidth
             lastNameTextField.layer.borderColor = UIColor.redColor().CGColor
         }
-        if emailTextField.textColor == UIColor.lightGrayColor() {
+        if emailTextField.textColor == UIColor.lightGrayColor() || emailTextField.text?.rangeOfString(Constants.emailRegex, options: .RegularExpressionSearch) == nil {
             errorMessages.append(Constants.noemail)
             emailTextField.layer.borderWidth = Constants.errorBorderWidth
             emailTextField.layer.borderColor = UIColor.redColor().CGColor
@@ -134,22 +136,23 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         } else {
             //attempt to log in
             self.performSegueWithIdentifier("goBacktoProfile", sender: self)
-            //            let user = PFUser()
-            //            user.username = emailTextField.text
-            //            user.email = emailTextField.text
-            //            user.password = passwordTextField.text
-            //            user["firstName"] = firstNameTextField.text
-            //            user["lastName"] = lastNameTextField.text
-            //            user.signUpInBackgroundWithBlock({
-            //                (succeeded: Bool, error: NSError?) -> Void in
-            //                if let error = error {
-            //                    let errorString = error.userInfo["error"] as? NSString
+//                        let user = PFUser()
+//                        user.username = emailTextField.text
+//                        user.email = emailTextField.text
+//                        user.password = passwordTextField.text
+//                        user["firstName"] = firstNameTextField.text
+//                        user["lastName"] = lastNameTextField.text
+//                        user.signUpInBackgroundWithBlock({
+//                            (succeeded: Bool, error: NSError?) -> Void in
+//                            if let error = error {
+//                                let errorString = error.userInfo["error"] as? NSString
 //                                self.errorMessages.append(errorString)
 //                                handleErrors()
-            //                } else {
-            //                    self.performSegueWithIdentifier("goBacktoProfile", sender: self)
-            //                }
-            //            })
+//                            } else {
+//                                //save user information
+//                                self.performSegueWithIdentifier("goBacktoProfile", sender: self)
+//                            }
+//                        })
         }
         
         //clear all so no left over for next sign up attempt
