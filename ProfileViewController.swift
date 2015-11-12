@@ -20,13 +20,21 @@ class ProfileViewController: UIViewController {
         
         static let signUpSegueID = "signUpPage"
         static let signInSegueID = "signInModal"
+        static let notSignedInTitle = "Your Profile"
+        static let signIn = "Sign In"
+        static let logOut = "Log Out"
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         if PFUser.currentUser() != nil {
-            
+            if let first = PFUser.currentUser()!["firstName"] as? String, last = PFUser.currentUser()!["lastName"] as? String {
+                self.title = first + last
+            }
+
         } else {
+            self.title = Constants.notSignedInTitle
+
             signIn()
             //sign-in & sign-up button shows up
 //            let signInButton = UIButton()
