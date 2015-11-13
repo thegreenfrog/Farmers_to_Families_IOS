@@ -10,6 +10,14 @@ import UIKit
 
 class ProfileTableViewController: UITableViewController {
 
+    // MARK: - Variables and Constants
+    
+    @IBOutlet weak var editInformationCell: UITableViewCell!
+    @IBOutlet weak var locationCell: UIView!
+    @IBOutlet weak var ordersCell: UILabel!
+    
+    let tabLabels = ["Edit Information", "Change Location", "Orders"]
+    
     @IBAction func signInLogOutAction(sender: UIBarButtonItem) {
         if sender.title == Constants.signIn {
             sender.title = Constants.logOut
@@ -51,6 +59,9 @@ class ProfileTableViewController: UITableViewController {
         static let logOut = "Log Out"
     }
     
+    
+    // MARK: - Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         if PFUser.currentUser() != nil {
@@ -62,29 +73,6 @@ class ProfileTableViewController: UITableViewController {
             self.title = Constants.notSignedInTitle
             signInLogOutButton.title = Constants.signIn
             signIn()
-            //sign-in & sign-up button shows up
-            //            let signInButton = UIButton()
-            //            signInButton.setTitle(Constants.signInTitle, forState: .Normal)
-            //            signInButton.frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.signInUpWidth, height: Constants.signInUpHeight))
-            //            signInButton.frame.origin.x = self.view.frame.size.width / 2
-            //            signInButton.frame.origin.y = (self.view.frame.height / 2) - Constants.signInVerticalSpacingFromCenter
-            //            signInButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
-            //            signInButton.backgroundColor = UIColor.blueColor()
-            //            signInButton.layer.cornerRadius = Constants.cornerRadius
-            //            signInButton.addTarget(self, action: "signIn", forControlEvents: .TouchUpInside)
-            //            self.view.addSubview(signInButton)
-            
-            //                        let signUpButton = UIButton()
-            //                        signUpButton.setTitle(Constants.signUpTitle, forState: .Normal)
-            //                        signUpButton.frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.signInUpWidth, height: Constants.signInUpHeight))
-            //                        signUpButton.frame.origin.x = self.view.bounds.midX
-            //                        signUpButton.frame.origin.y = self.view.bounds.midY + Constants.signInVerticalSpacingFromCenter
-            //                        signUpButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
-            //                        signUpButton.backgroundColor = UIColor.blueColor()
-            //                        signUpButton.layer.cornerRadius = Constants.cornerRadius
-            //                        signUpButton.addTarget(self, action: "signUp", forControlEvents: .TouchUpInside)
-            //                        self.view.addSubview(signUpButton)
-            
         }
         // Do any additional setup after loading the view.
     }
@@ -103,13 +91,17 @@ class ProfileTableViewController: UITableViewController {
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        if PFUser.currentUser() == nil {
+            return 0
+        }
+        return tabLabels.count
     }
+    
 
     /*
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {

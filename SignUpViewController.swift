@@ -84,7 +84,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     
     func textFieldDidEndEditing(textField: UITextField) {
         if textField.text!.isEmpty {
-            textField.text = "Placeholder"
+            textField.text = placeholders[textField.tag]
             textField.textColor = UIColor.lightGrayColor()
         }
         textField.resignFirstResponder()
@@ -106,28 +106,23 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         //make sure inputs are filled in properly
         if firstNameTextField.textColor == UIColor.lightGrayColor() {
             errorMessages.append(Constants.noFirstName)
-            firstNameTextField.layer.borderWidth = Constants.errorBorderWidth
-            firstNameTextField.layer.borderColor = UIColor.redColor().CGColor
+            highlightTextField(firstNameTextField)
         }
         if lastNameTextField.textColor == UIColor.lightGrayColor() {
             errorMessages.append(Constants.noLastName)
-            lastNameTextField.layer.borderWidth = Constants.errorBorderWidth
-            lastNameTextField.layer.borderColor = UIColor.redColor().CGColor
+            highlightTextField(lastNameTextField)
         }
         if emailTextField.textColor == UIColor.lightGrayColor() || emailTextField.text?.rangeOfString(Constants.emailRegex, options: .RegularExpressionSearch) == nil {
             errorMessages.append(Constants.noemail)
-            emailTextField.layer.borderWidth = Constants.errorBorderWidth
-            emailTextField.layer.borderColor = UIColor.redColor().CGColor
+            highlightTextField(emailTextField)
         }
         if passwordTextField.textColor == UIColor.lightGrayColor() || passwordTextField.text!.characters.count < 6 {
             errorMessages.append(Constants.noPassword)
-            passwordTextField.layer.borderWidth = Constants.errorBorderWidth
-            passwordTextField.layer.borderColor = UIColor.redColor().CGColor
+            highlightTextField(passwordTextField)
         }
         if retypePassTextField.textColor == UIColor.lightGrayColor() || retypePassTextField.text!.characters.count != passwordTextField.text!.characters.count {
             errorMessages.append(Constants.noretypePassword)
-            retypePassTextField.layer.borderWidth = Constants.errorBorderWidth
-            retypePassTextField.layer.borderColor = UIColor.redColor().CGColor
+            highlightTextField(retypePassTextField)
         }
         
         //submit user or post error message
@@ -157,6 +152,11 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         
         //clear all so no left over for next sign up attempt
         errorMessages.removeAll()
+    }
+    
+    func highlightTextField(textField: UITextField) {
+        textField.layer.borderWidth = Constants.errorBorderWidth
+        textField.layer.borderColor = UIColor.redColor().CGColor
     }
 
     func handleErrors() {
