@@ -20,17 +20,17 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var signupButton: UIButton!
     
     struct Constants {
-        static let noFirstName = "Please enter your first name"
-        static let noLastName = "Please enter your last name"
-        static let noemail = "Please enter your email address"
-        static let noPassword = "Please enter a password with at least 6 characters"
-        static let noretypePassword = "Please re-enter the same password"
+        static let NoFirstName = "Please enter your first name"
+        static let NoLastName = "Please enter your last name"
+        static let Noemail = "Please enter your email address"
+        static let NoPassword = "Please enter a password with at least 6 characters"
+        static let NoretypePassword = "Please re-enter the same password"
         
-        static let emailRegex = "[^@]+[@][a-z0-9]+[.][a-z]*"
+        static let EmailRegex = "[^@]+[@][a-z0-9]+[.][a-z]*"
         
-        static let errorBorderWidth:CGFloat = 1.0
-        static let errorMessageProportionHeight:CGFloat = 20.0
-        static let errorMessageWidth:CGFloat = 200.0
+        static let ErrorBorderWidth:CGFloat = 1.0
+        static let ErrorMessageProportionHeight:CGFloat = 20.0
+        static let ErrorMessageWidth:CGFloat = 200.0
     }
     
     let placeholders = ["First Name","Last Name", "Email Address", "Enter Password (at least 6 characters)", "re-Enter Password"]
@@ -105,23 +105,23 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     @IBAction func signupButton(sender: UIButton) {
         //make sure inputs are filled in properly
         if firstNameTextField.textColor == UIColor.lightGrayColor() {
-            errorMessages.append(Constants.noFirstName)
+            errorMessages.append(Constants.NoFirstName)
             highlightTextField(firstNameTextField)
         }
         if lastNameTextField.textColor == UIColor.lightGrayColor() {
-            errorMessages.append(Constants.noLastName)
+            errorMessages.append(Constants.NoLastName)
             highlightTextField(lastNameTextField)
         }
-        if emailTextField.textColor == UIColor.lightGrayColor() || emailTextField.text?.rangeOfString(Constants.emailRegex, options: .RegularExpressionSearch) == nil {
-            errorMessages.append(Constants.noemail)
+        if emailTextField.textColor == UIColor.lightGrayColor() || emailTextField.text?.rangeOfString(Constants.EmailRegex, options: .RegularExpressionSearch) == nil {
+            errorMessages.append(Constants.Noemail)
             highlightTextField(emailTextField)
         }
         if passwordTextField.textColor == UIColor.lightGrayColor() || passwordTextField.text!.characters.count < 6 {
-            errorMessages.append(Constants.noPassword)
+            errorMessages.append(Constants.NoPassword)
             highlightTextField(passwordTextField)
         }
         if retypePassTextField.textColor == UIColor.lightGrayColor() || retypePassTextField.text!.characters.count != passwordTextField.text!.characters.count {
-            errorMessages.append(Constants.noretypePassword)
+            errorMessages.append(Constants.NoretypePassword)
             highlightTextField(retypePassTextField)
         }
         
@@ -155,21 +155,21 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     }
     
     func highlightTextField(textField: UITextField) {
-        textField.layer.borderWidth = Constants.errorBorderWidth
+        textField.layer.borderWidth = Constants.ErrorBorderWidth
         textField.layer.borderColor = UIColor.redColor().CGColor
     }
 
     func handleErrors() {
-        let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)))
+        let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.ErrorMessageWidth, height: Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)))
         let errorSubView = UIView(frame: frame)
         errorSubView.center.x = signupButton.center.x
-        errorSubView.center.y = signupButton.center.y + Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)
+        errorSubView.center.y = signupButton.center.y + Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)
         errorSubView.layer.borderColor = UIColor.redColor().CGColor
-        errorSubView.layer.borderWidth = Constants.errorBorderWidth
+        errorSubView.layer.borderWidth = Constants.ErrorBorderWidth
         var count = 0
         for error in errorMessages {
-            let labelOrigin = CGPoint(x: errorSubView.layer.bounds.origin.x, y: errorSubView.layer.bounds.origin.y + Constants.errorMessageProportionHeight * CGFloat(count))
-            let errorFrame = CGRect(origin: labelOrigin, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight))
+            let labelOrigin = CGPoint(x: errorSubView.layer.bounds.origin.x, y: errorSubView.layer.bounds.origin.y + Constants.ErrorMessageProportionHeight * CGFloat(count))
+            let errorFrame = CGRect(origin: labelOrigin, size: CGSize(width: Constants.ErrorMessageWidth, height: Constants.ErrorMessageProportionHeight))
             let label = UILabel(frame: errorFrame)
             label.text = error
             label.lineBreakMode = NSLineBreakMode.ByWordWrapping

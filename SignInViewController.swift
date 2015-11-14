@@ -13,12 +13,12 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     // MARK: - Outlets and Variables
     
     struct Constants {
-        static let noemail = "Please enter your username"
-        static let noPassword = "Please enter your password"
+        static let NoEmail = "Please enter your username"
+        static let NoPassword = "Please enter your password"
         
-        static let errorBorderWidth:CGFloat = 1.0
-        static let errorMessageProportionHeight:CGFloat = 20.0
-        static let errorMessageWidth:CGFloat = 200.0
+        static let ErrorBorderWidth:CGFloat = 1.0
+        static let ErrorMessageProportionHeight:CGFloat = 20.0
+        static let ErrorMessageWidth:CGFloat = 200.0
     }
     
     @IBOutlet weak var emailTextField: UITextField!
@@ -88,13 +88,13 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         passwordTextField.layer.borderWidth = 0.0
         
         if emailTextField.textColor == UIColor.lightGrayColor() {
-            errorMessages.append(Constants.noemail)
+            errorMessages.append(Constants.NoEmail)
             emailTextField.layer.borderColor = UIColor.redColor().CGColor
-            emailTextField.layer.borderWidth = Constants.errorBorderWidth
+            emailTextField.layer.borderWidth = Constants.ErrorBorderWidth
         } else if passwordTextField.textColor == UIColor.lightGrayColor() {
-            errorMessages.append(Constants.noPassword)
+            errorMessages.append(Constants.NoPassword)
             passwordTextField.layer.borderColor = UIColor.redColor().CGColor
-            passwordTextField.layer.borderWidth = Constants.errorBorderWidth
+            passwordTextField.layer.borderWidth = Constants.ErrorBorderWidth
         }
         
         if(errorMessages.count > 0) {
@@ -116,16 +116,16 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     }
     
     func handleErrors() {
-        let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)))
+        let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.ErrorMessageWidth, height: Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)))
         let errorSubView = UIView(frame: frame)
         errorSubView.center.x = signUpButton.center.x
-        errorSubView.center.y = signUpButton.center.y + Constants.errorMessageProportionHeight * CGFloat(errorMessages.count)
+        errorSubView.center.y = signUpButton.center.y + Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)
         errorSubView.layer.borderColor = UIColor.redColor().CGColor
-        errorSubView.layer.borderWidth = Constants.errorBorderWidth
+        errorSubView.layer.borderWidth = Constants.ErrorBorderWidth
         var count = 0
         for error in errorMessages {
-            let labelOrigin = CGPoint(x: errorSubView.layer.bounds.origin.x, y: errorSubView.layer.bounds.origin.y + Constants.errorMessageProportionHeight * CGFloat(count))
-            let errorFrame = CGRect(origin: labelOrigin, size: CGSize(width: Constants.errorMessageWidth, height: Constants.errorMessageProportionHeight))
+            let labelOrigin = CGPoint(x: errorSubView.layer.bounds.origin.x, y: errorSubView.layer.bounds.origin.y + Constants.ErrorMessageProportionHeight * CGFloat(count))
+            let errorFrame = CGRect(origin: labelOrigin, size: CGSize(width: Constants.ErrorMessageWidth, height: Constants.ErrorMessageProportionHeight))
             let label = UILabel(frame: errorFrame)
             label.text = error
             label.lineBreakMode = NSLineBreakMode.ByWordWrapping

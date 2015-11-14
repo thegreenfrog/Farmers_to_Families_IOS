@@ -11,7 +11,7 @@ import UIKit
 class ChangeAcountSettingsViewController: UIViewController, UITextFieldDelegate {
 
     struct Constants {
-        static let saveSegue = "updatedAccount"
+        static let SaveSegue = "updatedAccount"
     }
     
     @IBOutlet weak var emailTextField: UITextField!
@@ -46,7 +46,7 @@ class ChangeAcountSettingsViewController: UIViewController, UITextFieldDelegate 
                 return
             }
         }
-        performSegueWithIdentifier(Constants.saveSegue, sender: self)
+        performSegueWithIdentifier(Constants.SaveSegue, sender: self)
     }
     
     // MARK: - Storyboard UI Functions
