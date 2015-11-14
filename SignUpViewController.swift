@@ -78,14 +78,20 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         if textField.textColor == UIColor.lightGrayColor() {
             textField.text = nil
             textField.textColor = UIColor.blackColor()
+            if textField.tag == 3 || textField.tag == 4 {
+                textField.secureTextEntry = true
+            }
         }
         textField.becomeFirstResponder()
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
         if textField.text!.isEmpty {
-            textField.text = placeholders[textField.tag]
+            if textField.tag == 3 || textField.tag == 4 {
+                textField.secureTextEntry = false
+            }
             textField.textColor = UIColor.lightGrayColor()
+            textField.text = placeholders[textField.tag]
         }
         textField.resignFirstResponder()
     }
@@ -131,23 +137,24 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         } else {
             //attempt to log in
             self.performSegueWithIdentifier("goBacktoProfile", sender: self)
-//                        let user = PFUser()
-//                        user.username = emailTextField.text
-//                        user.email = emailTextField.text
-//                        user.password = passwordTextField.text
-//                        user["firstName"] = firstNameTextField.text
-//                        user["lastName"] = lastNameTextField.text
-//                        user.signUpInBackgroundWithBlock({
-//                            (succeeded: Bool, error: NSError?) -> Void in
-//                            if let error = error {
-//                                let errorString = error.userInfo["error"] as? NSString
-//                                self.errorMessages.append(errorString)
-//                                handleErrors()
-//                            } else {
-//                                //save user information
-//                                self.performSegueWithIdentifier("goBacktoProfile", sender: self)
-//                            }
-//                        })
+            let user = PFUser()
+            user.username = emailTextField.text
+            user.email = emailTextField.text
+            user.password = passwordTextField.text
+            user["firstName"] = firstNameTextField.text
+            user["lastName"] = lastNameTextField.text
+            user.signUpInBackgroundWithBlock({
+                (succeeded: Bool, error: NSError?) -> Void in
+                if let error = error {
+                    if let errorString = error.userInfo["error"] as? NSString {
+                        self.errorMessages.append(errorString as String)
+                    }
+                    self.handleErrors()
+                } else {
+                    //save user information
+                    self.performSegueWithIdentifier("goBacktoProfile", sender: self)
+                }
+            })
         }
         
         //clear all so no left over for next sign up attempt

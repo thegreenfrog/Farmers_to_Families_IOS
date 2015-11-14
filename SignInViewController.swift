@@ -59,12 +59,18 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         if textField.textColor == UIColor.lightGrayColor() {
             textField.text = nil
             textField.textColor = UIColor.blackColor()
+            if textField.tag == 1 {
+                textField.secureTextEntry = true
+            }
         }
         textField.becomeFirstResponder()
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
         if textField.text!.isEmpty {
+            if textField.tag == 1 {
+                textField.secureTextEntry = false
+            }
             textField.text = placeholders[textField.tag]
             textField.textColor = UIColor.lightGrayColor()
         }
@@ -100,16 +106,17 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         if(errorMessages.count > 0) {
             handleErrors()
         } else {
+            print(passwordTextField.text!)
             PFUser.logInWithUsernameInBackground(emailTextField.text!, password: passwordTextField.text!) {
                 (user: PFUser?, error: NSError?) -> Void in
                 if user != nil {
+                    self.performSegueWithIdentifier("cancelFromSignIn", sender: self)
+                } else {
+                    // The login failed
                     if let error = error {
                         self.errorMessages.append(error.localizedDescription)
                         self.handleErrors()
                     }
-                } else {
-                    // The login failed
-                    
                 }
             }
         }

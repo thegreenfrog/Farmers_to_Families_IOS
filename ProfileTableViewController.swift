@@ -20,8 +20,8 @@ class ProfileTableViewController: UITableViewController {
     
     @IBAction func signInLogOutAction(sender: UIBarButtonItem) {
         if sender.title == Constants.signIn {
-            sender.title = Constants.logOut
             signIn()
+            
         } else {
             let alert = UIAlertController(title: "Logout", message: "Are you sure you want to log out?", preferredStyle: UIAlertControllerStyle.Alert)
             alert.addAction(UIAlertAction(
@@ -29,7 +29,7 @@ class ProfileTableViewController: UITableViewController {
                 style: UIAlertActionStyle.Default)
                 { (action: UIAlertAction) -> Void in
                     PFUser.logOut()
-                    sender.title = Constants.signIn
+                    self.checkSignInStatus()
                 }
             )
             alert.addAction(UIAlertAction(
@@ -64,17 +64,33 @@ class ProfileTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Do any additional setup after loading the view.
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        checkSignInStatus()
+    }
+    
+    func checkSignInStatus() {
         if PFUser.currentUser() != nil {
             if let first = PFUser.currentUser()!["firstName"] as? String, last = PFUser.currentUser()!["lastName"] as? String {
-                self.title = first + last
+                self.title = first + " " + last
+                editInformationCell.hidden = false
+                locationCell.hidden = false
+                ordersCell.hidden = false
+            } else {
+                self.title = "No Name"
             }
             signInLogOutButton.title = Constants.logOut
         } else {
             self.title = Constants.notSignedInTitle
             signInLogOutButton.title = Constants.signIn
+            editInformationCell.hidden = true
+            locationCell.hidden = true
+            ordersCell.hidden = true
             signIn()
         }
-        // Do any additional setup after loading the view.
     }
     
     func signIn() {

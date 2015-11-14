@@ -22,8 +22,8 @@ class ChangeAcountSettingsViewController: UIViewController, UITextFieldDelegate 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        lastNameTextField.text = String(PFUser.currentUser()!["firstName"])
-        firstNameTextField.text = String(PFUser.currentUser()!["lastName"])
+        firstNameTextField.text = String(PFUser.currentUser()!["firstName"])
+        lastNameTextField.text = String(PFUser.currentUser()!["lastName"])
         emailTextField.text = PFUser.currentUser()!.email
         firstNameTextField.tag = 0
         lastNameTextField.tag = 1
@@ -41,7 +41,7 @@ class ChangeAcountSettingsViewController: UIViewController, UITextFieldDelegate 
             user["firstName"] = firstNameTextField.text
             user["lastName"] = lastNameTextField.text
             do {
-                //_ = try user.save()
+                _ = try user.save()
             } catch {
                 return
             }
