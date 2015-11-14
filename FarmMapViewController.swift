@@ -30,7 +30,18 @@ class FarmMapViewController: UIViewController, MKMapViewDelegate {
         mapView.delegate = self
         let seattlePin = LocalFarm(title: "Seattle", locationName: "Downtown Seattle", coordinate: CLLocationCoordinate2D(latitude: Constants.Seattle.coordinate.latitude, longitude: Constants.Seattle.coordinate.longitude))
         mapView.addAnnotation(seattlePin)
+        
+        let dropPinGesture = UILongPressGestureRecognizer(target: self, action: Selector("dropPin:"))
+        mapView.addGestureRecognizer(dropPinGesture)
         // Do any additional setup after loading the view.
+    }
+    
+    func dropPin(gesture: UILongPressGestureRecognizer) {
+        if gesture.state == UIGestureRecognizerState.Began {
+            let coordinate = mapView.convertPoint(gesture.locationInView(mapView), toCoordinateFromView: mapView)
+            let farmPin = LocalFarm(title: "User Dropped Pin", locationName: "", coordinate: coordinate)
+            mapView.addAnnotation(farmPin)
+        }
     }
     
     func centerMaponLoc(location: CLLocation) {
@@ -54,6 +65,25 @@ class FarmMapViewController: UIViewController, MKMapViewDelegate {
             return view
         }
         return nil
+    }
+    
+    func mapView(mapView: MKMapView, didAddAnnotationViews views: [MKAnnotationView]) {
+        for pins in views {
+            let endFrame = pins.frame
+            pins.frame = CGRectOffset(endFrame, 0, -500)
+            UIView.animateWithDuration(0.5, animations: {() in
+                pins.frame = endFrame
+                }, completion: {(bool) in
+                    UIView.animateWithDuration(0.05, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations:{() in
+                        pins.transform = CGAffineTransformMakeScale(1.0, 0.6)
+                        }, completion: {(Bool) in
+                            UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations:{() in
+                                pins.transform = CGAffineTransformIdentity
+                                }, completion: nil)
+                    })
+                }
+            )
+        }
     }
     
 
