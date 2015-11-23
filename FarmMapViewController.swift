@@ -10,11 +10,13 @@ import UIKit
 import MapKit
 
 class FarmMapViewController: UIViewController, MKMapViewDelegate {
-
+    
     struct Constants {
-        static let Seattle:CLLocation = CLLocation(latitude: 47.606163, longitude: -122.299805)
+        static let Brunswick:CLLocation = CLLocation(latitude: 43.9108, longitude: -69.9631)
         static let MapRadius:CLLocationDistance = 1000
     }
+    
+    var farms = [LocalFarm]()
     
     @IBOutlet weak var mapView: MKMapView! {
         didSet {
@@ -23,13 +25,54 @@ class FarmMapViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
+    //allows for toggle between map view and list view of search results
+    var mapViewController: UIViewController?
+    var listViewController: UIViewController?
+    
+    private var activeViewController: UIViewController? {
+        didSet {
+            removeIdleViewController(oldValue)
+            updateActiveViewControllerInParentView()
+        }
+    }
+    
+    private func removeIdleViewController(idleViewController: UIViewController?) {
+        if let inactiveView = idleViewController {
+            inactiveView.willMoveToParentViewController(nil)
+            inactiveView.view.removeFromSuperview()
+            inactiveView.removeFromParentViewController()
+        }
+    }
+    
+    private func updateActiveViewControllerInParentView() {
+        if let activeVC = activeViewController {
+            addChildViewController(activeVC)
+            activeVC.view.frame = self.view.bounds
+            self.view.addSubview(activeVC.view)
+            activeVC.didMoveToParentViewController(self)
+        }
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        centerMaponLoc(Constants.Seattle)
+    
+        if mapViewController != nil {
+            let mapViewInstance = MKMapView()
+            mapViewInstance.mapType = .Satellite
+            mapViewInstance.frame = self.view.frame
+            mapViewController!.view.addSubview(mapViewInstance)
+        }
+        centerMaponLoc(Constants.Brunswick)
         mapView.delegate = self
-        let seattlePin = LocalFarm(title: "Seattle", locationName: "Downtown Seattle", coordinate: CLLocationCoordinate2D(latitude: Constants.Seattle.coordinate.latitude, longitude: Constants.Seattle.coordinate.longitude))
-        mapView.addAnnotation(seattlePin)
+        let brunswickPin = LocalFarm(title: "Brunwick", locationName: "Downtown Brunswick", coordinate: CLLocationCoordinate2D(latitude: Constants.Brunswick.coordinate.latitude, longitude: Constants.Brunswick.coordinate.longitude))
+        mapView.addAnnotation(brunswickPin)
+        
+        if farms.count > 0 {
+            for individual in farms {
+                mapView.addAnnotation(individual)
+            }
+        }
         
         let dropPinGesture = UILongPressGestureRecognizer(target: self, action: Selector("dropPin:"))
         mapView.addGestureRecognizer(dropPinGesture)
