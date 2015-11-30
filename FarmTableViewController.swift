@@ -31,8 +31,8 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
         
         self.mapContainerView.hidden = true
         
-        farms = [LocalFarm(title: "Rocky Ridge Farm", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 44.028944, longitude: -69.946586)), LocalFarm(title: "Milkweed Farms", locationName: "Brunswick", coordinate: CLLocationCoordinate2D(latitude: 43.883284, longitude: -69.997941)), LocalFarm(title: "Mitchell and Savage Maple Products", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 43.905914, longitude: -69.963668)), LocalFarm(title: "Tall Pines Farm", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 44.027677, longitude: -70.023428)), LocalFarm(title: "Whatley Farm", locationName: "Topsham", coordinate: CLLocationCoordinate2D(latitude: 43.927544, longitude: -69.975946))]
-        
+        farms = [LocalFarm(title: "Rocky Ridge Farm", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 44.028944, longitude: -69.946586), url: NSURL(string: "http://rockyridgeorchard.com/")), LocalFarm(title: "Milkweed Farms", locationName: "Brunswick", coordinate: CLLocationCoordinate2D(latitude: 43.883284, longitude: -69.997941), url: NSURL(string: "https://milkweedfarm.wordpress.com/")), LocalFarm(title: "Mitchell and Savage Maple Products", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 43.905914, longitude: -69.963668), url: NSURL(string: "http://www.mainemaplekitchen.net/")), LocalFarm(title: "Tall Pines Farm", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 44.027677, longitude: -70.023428), url: nil), LocalFarm(title: "Whatley Farm", locationName: "Topsham", coordinate: CLLocationCoordinate2D(latitude: 43.927544, longitude: -69.975946), url: nil)]
+        filteredFarmSearch = farms
         self.tableView.reloadData()
 
         // Uncomment the following line to preserve selection between presentations
@@ -128,6 +128,10 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
         return true
     }
     
+    @IBAction func unwindToFarmSearch(segue: UIStoryboardSegue) {
+        
+    }
+    
     
     // MARK: - Navigation
 
@@ -139,6 +143,14 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
             if identifier == "showMap" {
                 if let destination = segue.destinationViewController as? FarmMapViewController {
                     destination.farms = self.filteredFarmSearch
+                }
+            } else if identifier == "showFarmDetail" {
+                if let navCont = segue.destinationViewController as? UINavigationController {
+                    if let destination = navCont.topViewController as? FarmDetailTableViewController {
+                        if let row = self.tableView.indexPathForSelectedRow?.row {
+                            destination.farmDetails = filteredFarmSearch[row]
+                        }
+                    }
                 }
             }
         }

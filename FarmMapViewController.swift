@@ -65,7 +65,7 @@ class FarmMapViewController: UIViewController, MKMapViewDelegate {
         }
         centerMaponLoc(Constants.Brunswick)
         mapView.delegate = self
-        let brunswickPin = LocalFarm(title: "Brunwick", locationName: "Downtown Brunswick", coordinate: CLLocationCoordinate2D(latitude: Constants.Brunswick.coordinate.latitude, longitude: Constants.Brunswick.coordinate.longitude))
+        let brunswickPin = LocalFarm(title: "Brunwick", locationName: "Downtown Brunswick", coordinate: CLLocationCoordinate2D(latitude: Constants.Brunswick.coordinate.latitude, longitude: Constants.Brunswick.coordinate.longitude), url: nil)
         mapView.addAnnotation(brunswickPin)
         
         if farms.count > 0 {
@@ -82,7 +82,7 @@ class FarmMapViewController: UIViewController, MKMapViewDelegate {
     func dropPin(gesture: UILongPressGestureRecognizer) {
         if gesture.state == UIGestureRecognizerState.Began {
             let coordinate = mapView.convertPoint(gesture.locationInView(mapView), toCoordinateFromView: mapView)
-            let farmPin = LocalFarm(title: "User Dropped Pin", locationName: "", coordinate: coordinate)
+            let farmPin = LocalFarm(title: "User Dropped Pin", locationName: "", coordinate: coordinate, url: nil)
             mapView.addAnnotation(farmPin)
         }
     }
