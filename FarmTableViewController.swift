@@ -148,7 +148,9 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
                 if let navCont = segue.destinationViewController as? UINavigationController {
                     if let destination = navCont.topViewController as? FarmDetailTableViewController {
                         if let row = self.tableView.indexPathForSelectedRow?.row {
-                            destination.farmDetails = filteredFarmSearch[row]
+                            let farm = filteredFarmSearch[row]
+                            destination.farmDetails = farm
+                            destination.navigationController?.title = farm.title
                         }
                     }
                 }

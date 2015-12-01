@@ -12,9 +12,9 @@ class FarmDetailTableViewController: UITableViewController {
     
     var farmDetails: LocalFarm?
     
-    let detailTabs = ["See what is available", "Whats coming up in season", "See more about what they are about", "Been there? Take a picture"]
+    let detailTabs = ["See what is available", "Whats coming up in season", "See more about what they are about", "Pictures!"]
     
-    let segueNames = ["showCurrentProduce", "showFutureProduce", "showWebsite", "takePicture"]
+    let segueNames = ["showCurrentProduce", "showFutureProduce", "showWebsite", "showPictures"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,8 +55,14 @@ class FarmDetailTableViewController: UITableViewController {
         return cell
     }
     
+
+    
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.textColor != UIColor.lightGrayColor() {
+            if indexPath.row == 3 {
+
+                
+            }
             performSegueWithIdentifier(segueNames[indexPath.row], sender: self)
         }
         
@@ -102,6 +108,10 @@ class FarmDetailTableViewController: UITableViewController {
     @IBAction func goBackToSearch(sender: UIBarButtonItem) {
         performSegueWithIdentifier("returnToSearch", sender: sender)
     }
+    
+    @IBAction func unwindBackToFarmDetail(segue: UIStoryboardSegue) {
+        
+    }
 
 
     // MARK: - Navigation
@@ -114,6 +124,8 @@ class FarmDetailTableViewController: UITableViewController {
         if segue.identifier == "showWebsite" {
             let destination = segue.destinationViewController as? WebsiteViewController
             destination?.webURL = farmDetails?.websiteURL
+        } else if segue.identifier == "showPictures" {
+            
         }
     }
 
