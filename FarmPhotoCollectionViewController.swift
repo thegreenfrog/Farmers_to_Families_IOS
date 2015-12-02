@@ -38,15 +38,17 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
     }
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        dismissViewControllerAnimated(true, completion: nil)
+        
         var image = info[UIImagePickerControllerEditedImage] as? UIImage
         if image == nil {
-            image = info[UIImagePickerControllerEditedImage] as? UIImage
+            image = info[UIImagePickerControllerOriginalImage] as? UIImage
         }
         
         //put image somewhere
         userPhotos.append(image!)
         
-        dismissViewControllerAnimated(true, completion: nil)
+
         self.collectionView?.reloadData()
     }
     
@@ -56,6 +58,15 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
             picker.sourceType = .Camera
             picker.delegate = self
             picker.allowsEditing = true
+            presentViewController(picker, animated: true, completion: nil)
+        }
+    }
+    
+    func addPhotoFromLibrary() {
+        if UIImagePickerController.isSourceTypeAvailable(.PhotoLibrary) {
+            let picker = UIImagePickerController()
+            picker.sourceType = .PhotoLibrary
+            picker.delegate = self
             presentViewController(picker, animated: true, completion: nil)
         }
     }
@@ -70,6 +81,13 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
                 self.takePhoto()
             }
         )
+        alert.addAction(UIAlertAction(title: "Photo Library",
+            style: UIAlertActionStyle.Default)
+            {(action: UIAlertAction) -> Void in
+                self.addPhotoFromLibrary()
+            }
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
         presentViewController(alert, animated: true, completion: nil)
     }
     /*
