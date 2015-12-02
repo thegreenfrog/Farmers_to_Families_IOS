@@ -34,6 +34,9 @@ class ChangeAcountSettingsViewController: UIViewController, UITextFieldDelegate 
         
     }
 
+    @IBAction func cancelEdit(sender: UIBarButtonItem) {
+        performSegueWithIdentifier(Constants.SaveSegue, sender: self)
+    }
     @IBAction func saveChanges(sender: UIBarButtonItem) {
         if let user = PFUser.currentUser() {
             user.email = emailTextField.text

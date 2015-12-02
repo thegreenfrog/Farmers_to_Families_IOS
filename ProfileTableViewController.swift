@@ -12,16 +12,12 @@ class ProfileTableViewController: UITableViewController {
 
     // MARK: - Variables and Constants
     
-    @IBOutlet weak var editInformationCell: UITableViewCell!
-    @IBOutlet weak var locationCell: UIView!
-    @IBOutlet weak var ordersCell: UILabel!
-    
-    let tabLabels = ["Edit Information", "Change Location", "Orders"]
+    let tabLabels = ["Edit Information"]//"Change Location", "Orders"
+    let segueIdentifiers = ["changeUserInfo"]//"changeLocation", "seeOrders"
     
     @IBAction func signInLogOutAction(sender: UIBarButtonItem) {
         if sender.title == Constants.signIn {
             signIn()
-            
         } else {
             let alert = UIAlertController(title: "Logout", message: "Are you sure you want to log out?", preferredStyle: UIAlertControllerStyle.Alert)
             alert.addAction(UIAlertAction(
@@ -29,7 +25,7 @@ class ProfileTableViewController: UITableViewController {
                 style: UIAlertActionStyle.Default)
                 { (action: UIAlertAction) -> Void in
                     PFUser.logOut()
-                    self.checkSignInStatus()
+                    self.tableView.reloadData()
                 }
             )
             alert.addAction(UIAlertAction(
@@ -52,6 +48,7 @@ class ProfileTableViewController: UITableViewController {
         static let cornerRadius: CGFloat = 2.5
         static let signInVerticalSpacingFromCenter:CGFloat = 20
         
+        static let cellIdentifier = "profileCell"
         static let signUpSegueID = "signUpPage"
         static let signInSegueID = "signInModal"
         static let notSignedInTitle = "Your Profile"
@@ -69,29 +66,23 @@ class ProfileTableViewController: UITableViewController {
     }
     
     override func viewWillAppear(animated: Bool) {
-        checkSignInStatus()
+        self.tableView.reloadData()
     }
     
-    func checkSignInStatus() {
-        if PFUser.currentUser() != nil {
-            if let first = PFUser.currentUser()!["firstName"] as? String, last = PFUser.currentUser()!["lastName"] as? String {
-                self.title = first + " " + last
-                editInformationCell.hidden = false
-                locationCell.hidden = false
-                ordersCell.hidden = false
-            } else {
-                self.title = "No Name"
-            }
-            signInLogOutButton.title = Constants.logOut
-        } else {
-            self.title = Constants.notSignedInTitle
-            signInLogOutButton.title = Constants.signIn
-            editInformationCell.hidden = true
-            locationCell.hidden = true
-            ordersCell.hidden = true
-            signIn()
-        }
-    }
+//    func checkSignInStatus() {
+//        if PFUser.currentUser() != nil {
+//            if let first = PFUser.currentUser()!["firstName"] as? String, last = PFUser.currentUser()!["lastName"] as? String {
+//                self.title = first + " " + last
+//            } else {
+//                self.title = "No Name"
+//            }
+//            signInLogOutButton.title = Constants.logOut
+//        } else {
+//            self.title = Constants.notSignedInTitle
+//            signInLogOutButton.title = Constants.signIn
+//            signIn()
+//        }
+//    }
     
     func signIn() {
         performSegueWithIdentifier(Constants.signInSegueID, sender: self)
@@ -113,21 +104,36 @@ class ProfileTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         if PFUser.currentUser() == nil {
+            self.title = Constants.notSignedInTitle
+            signInLogOutButton.title = Constants.signIn
+            signIn()
             return 0
+        } else {
+            if let first = PFUser.currentUser()!["firstName"] as? String, last = PFUser.currentUser()!["lastName"] as? String {
+                self.title = first + " " + last
+            } else {
+                self.title = "No Name"
+            }
+            signInLogOutButton.title = Constants.logOut
+            return tabLabels.count
         }
-        return tabLabels.count
+        
     }
     
 
-    /*
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath)
-
+        let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath)
+        cell.textLabel?.text = tabLabels[indexPath.row]
+        cell.accessoryType = .DisclosureIndicator
         // Configure the cell...
 
         return cell
     }
-    */
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        performSegueWithIdentifier(segueIdentifiers[indexPath.row], sender: self)
+        tableView.cellForRowAtIndexPath(indexPath)?.selected = false
+    }
 
     /*
     // Override to support conditional editing of the table view.
@@ -164,7 +170,7 @@ class ProfileTableViewController: UITableViewController {
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -172,6 +178,6 @@ class ProfileTableViewController: UITableViewController {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
     }
-    */
+
 
 }
