@@ -15,7 +15,11 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
         static let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
     }
     
-    var userPhotos = [UIImage]()
+    var userPhotos = [UIImage]() {
+        didSet {
+            //update farm profile in Parse
+        }
+    }
 
     @IBAction func goBackToFarmSearch(sender: UIBarButtonItem) {
         performSegueWithIdentifier("goBackFarmSearchFromPicture", sender: self)
@@ -67,6 +71,7 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
             let picker = UIImagePickerController()
             picker.sourceType = .PhotoLibrary
             picker.delegate = self
+            picker.allowsEditing = true
             presentViewController(picker, animated: true, completion: nil)
         }
     }
