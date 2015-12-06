@@ -13,13 +13,11 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
     struct Constants {
         static let reuseIdentifier = "photoCell"
         static let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
+        static let photoClassName = "FarmPhotos"
     }
     
-    var userPhotos = [UIImage]() {
-        didSet {
-            //update farm profile in Parse
-        }
-    }
+    var userPhotos = [UIImage]()
+    var farmName: LocalFarm?
 
     @IBAction func goBackToFarmSearch(sender: UIBarButtonItem) {
         performSegueWithIdentifier("goBackFarmSearchFromPicture", sender: self)
@@ -41,6 +39,31 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
         // Dispose of any resources that can be recreated.
     }
     
+    // MARK: - Camera Functions
+    
+    //save photo in Parse Cloud
+    func savePhotoInParse(newImage: UIImage) {
+        let data = UIImageJPEGRepresentation(newImage, 0.5)
+        let imageFile = PFFile(name: "Image.jpg", data: data!)
+        
+        //save image in Parse
+        imageFile?.saveInBackgroundWithBlock({(suceeded: Bool, error: NSError?) -> Void in
+            if suceeded {
+                //associate PFObject with image
+                let newPhotoObject = PFObject(className: Constants.photoClassName)
+                newPhotoObject.setObject(imageFile!, forKey: "image")
+                newPhotoObject.setObject(self.farmName!.title!, forKey: "farm")
+                newPhotoObject.saveInBackgroundWithBlock({(suceeded: Bool, error: NSError?) -> Void in
+                    if (error == nil) {
+                        print("object and photo save successful")
+                    }
+                })
+            }
+        })
+        //maybe do progress farmNamebar?
+        
+    }
+    
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         dismissViewControllerAnimated(true, completion: nil)
         
@@ -51,8 +74,7 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
         
         //put image somewhere
         userPhotos.append(image!)
-        
-
+        savePhotoInParse(image!)
         self.collectionView?.reloadData()
     }
     
@@ -95,6 +117,7 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
         presentViewController(alert, animated: true, completion: nil)
     }
+    
     /*
     // MARK: - Navigation
 
@@ -192,6 +215,8 @@ class FarmPhotoCollectionViewController: UICollectionViewController, UICollectio
     */
 
 }
+
+//calculate aspect ratio of image
 
 extension UIImage {
     var aspectRatio: CGFloat {

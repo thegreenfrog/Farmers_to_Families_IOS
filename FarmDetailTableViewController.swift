@@ -125,6 +125,29 @@ class FarmDetailTableViewController: UITableViewController {
             let destination = segue.destinationViewController as? WebsiteViewController
             destination?.webURL = farmDetails?.websiteURL
         } else if segue.identifier == "showPictures" {
+            let destination = segue.destinationViewController as? UINavigationController
+            if let photoCollectionVC = destination?.topViewController as? FarmPhotoCollectionViewController {
+                photoCollectionVC.farmName = farmDetails
+                let query = PFQuery(className: "FarmPhotos")
+                query.whereKey("farm", equalTo: (farmDetails?.title)!)
+                query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
+                    if error == nil {
+                        if let objects = objects {
+                            for object in objects {
+                                if let image = object["image"] as? PFFile {
+                                    image.getDataInBackgroundWithBlock({ (imageData: NSData?, error: NSError?) -> Void in
+                                        if (error == nil) {
+                                            photoCollectionVC.userPhotos.append(UIImage(data: imageData!)!)
+                                            photoCollectionVC.collectionView?.reloadData()
+                                        }
+                                    })
+                                }
+                            }
+                            
+                        }
+                    }
+                })
+            }
             
         }
     }
