@@ -548,6 +548,7 @@
                     <connections>
                         <segue destination="5qU-Qk-OfV" kind="show" identifier="showWebsite" id="5J9-7S-VTr"/>
                         <segue destination="otD-IK-x53" kind="show" identifier="showPictures" id="jOH-Ka-58n"/>
+                        <segue destination="Yx5-V7-IBp" kind="show" identifier="showCurrentProduce" id="2fF-C3-o0Y"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lYX-L0-HT7" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -617,7 +618,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1tO-jO-eHx" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="bw5-u2-d28" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3419" y="1680"/>
+            <point key="canvasLocation" x="3941" y="1658"/>
         </scene>
         <!--Website View Controller-->
         <scene sceneID="cEQ-2A-XHK">
@@ -715,6 +716,63 @@
             </objects>
             <point key="canvasLocation" x="1837" y="961"/>
         </scene>
+        <!--Farm Current Produce Table View Controller-->
+        <scene sceneID="DgV-2s-ntd">
+            <objects>
+                <tableViewController id="vXT-bp-1sB" customClass="FarmCurrentProduceTableViewController" customModule="LocalFarming" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="67" sectionHeaderHeight="28" sectionFooterHeight="28" id="Uha-Mq-Zni">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="produceCell" rowHeight="67" id="SjO-4M-YDV" customClass="ProduceTableViewCell" customModule="LocalFarming" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="92" width="600" height="67"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="SjO-4M-YDV" id="TIo-fb-eFK">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="66"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Produce Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jjo-eM-I93">
+                                            <rect key="frame" x="8" y="8" width="114" height="50"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Price" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PNI-y2-Szz">
+                                            <rect key="frame" x="536" y="8" width="56" height="50"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="topMargin" secondItem="Jjo-eM-I93" secondAttribute="top" id="D8n-E8-lUN"/>
+                                        <constraint firstItem="PNI-y2-Szz" firstAttribute="centerY" secondItem="TIo-fb-eFK" secondAttribute="centerY" id="DPR-Sc-EwT"/>
+                                        <constraint firstItem="Jjo-eM-I93" firstAttribute="centerY" secondItem="TIo-fb-eFK" secondAttribute="centerY" id="Ige-Bw-pBP"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="PNI-y2-Szz" secondAttribute="trailing" id="JKf-qu-0Jj"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="PNI-y2-Szz" secondAttribute="bottom" id="afq-Rk-Uc3"/>
+                                        <constraint firstAttribute="topMargin" secondItem="PNI-y2-Szz" secondAttribute="top" id="dyD-sR-V2l"/>
+                                        <constraint firstAttribute="leadingMargin" secondItem="Jjo-eM-I93" secondAttribute="leading" id="rCs-F7-Ryp"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="Jjo-eM-I93" secondAttribute="bottom" id="yP8-Ub-HU6"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="Price" destination="PNI-y2-Szz" id="fbn-Eb-00G"/>
+                                    <outlet property="ProduceName" destination="Jjo-eM-I93" id="I0j-6N-3lL"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="vXT-bp-1sB" id="d4M-u7-x5O"/>
+                            <outlet property="delegate" destination="vXT-bp-1sB" id="hIB-Kq-gvO"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="nKu-jh-hOn"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="NPx-Ui-OTO" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4068" y="2360"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="eJf-zK-DxT">
             <objects>
@@ -731,7 +789,25 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ByR-4Q-ida" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2607" y="1680"/>
+            <point key="canvasLocation" x="3256" y="1658"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="3m9-zj-Ftg">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Yx5-V7-IBp" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="tBP-Ny-jxb">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="vXT-bp-1sB" kind="relationship" relationship="rootViewController" id="c8Z-S4-9G5"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7P8-0q-zr4" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3256" y="2360"/>
         </scene>
     </scenes>
 </document>

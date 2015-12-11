@@ -131,24 +131,38 @@ class FarmDetailTableViewController: UITableViewController {
                 let query = PFQuery(className: "FarmPhotos")
                 query.whereKey("farm", equalTo: (farmDetails?.title)!)
                 query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
+                    if error != nil ||  objects == nil{
+                        return
+                    }
+                    for object in objects! {
+                        if let image = object["image"] as? PFFile {
+                            image.getDataInBackgroundWithBlock({ (imageData: NSData?, error: NSError?) -> Void in
+                                if (error == nil) {
+                                    photoCollectionVC.userPhotos.append(UIImage(data: imageData!)!)
+                                    photoCollectionVC.collectionView?.reloadData()
+                                }
+                            })
+                        }
+                    }
+                    
+                })
+            }
+            
+        } else if segue.identifier == "showCurrentProduce" {
+            let destination = segue.destinationViewController as? UINavigationController
+            if let produceVC = destination?.topViewController as? FarmCurrentProduceTableViewController {
+                destination?.title = farmDetails?.title
+                let query = PFQuery(className: "AvailableProduce")
+                query.whereKey("Farm", equalTo: (farmDetails?.title)!)
+                query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
                     if error == nil {
                         if let objects = objects {
-                            for object in objects {
-                                if let image = object["image"] as? PFFile {
-                                    image.getDataInBackgroundWithBlock({ (imageData: NSData?, error: NSError?) -> Void in
-                                        if (error == nil) {
-                                            photoCollectionVC.userPhotos.append(UIImage(data: imageData!)!)
-                                            photoCollectionVC.collectionView?.reloadData()
-                                        }
-                                    })
-                                }
-                            }
-                            
+                            produceVC.produceList = objects
+                            produceVC.tableView.reloadData()
                         }
                     }
                 })
             }
-            
         }
     }
 
