@@ -8,13 +8,25 @@
 
 import UIKit
 
-class FarmCurrentProduceTableViewController: UITableViewController {
+class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurchaseQueueDelegate {
 
+    struct Constants {
+        static let priceKey = "price"
+        static let produceNameKey = "produceName"
+        static let cellIdentifier = "produceCell"
+        static let UpdateBagButtonHeight = CGFloat(50.0)
+    }
+    
     var produceList = [PFObject]()
+    var producePurchaseCount = [String: Int]()
+    var BagNeedsUpdating = false
+    var UpdateBagButton: UIButton?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(produceList.count)
+        for produce in produceList {
+            producePurchaseCount[produce[Constants.produceNameKey] as! String] = 0
+        }
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -25,6 +37,33 @@ class FarmCurrentProduceTableViewController: UITableViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    @IBAction func UpdateBagAction(sender: UIButton) {
+        
+    }
+    
+    func showUpdateBagButton() {
+        print("showing update button")
+        UpdateBagButton = UIButton()
+        UpdateBagButton!.setTitle("Update Grocery Bag", forState: .Normal)
+        UpdateBagButton!.frame = CGRectMake(0, self.view.bounds.maxY - self.tabBarController!.tabBar.frame.height, self.view.bounds.width, Constants.UpdateBagButtonHeight)
+        UpdateBagButton!.addTarget(self, action: "UpdateBagAction:", forControlEvents: .TouchUpInside)
+        UpdateBagButton?.backgroundColor = UIColor.blackColor()
+        self.view.addSubview(UpdateBagButton!)
+        UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+            self.UpdateBagButton!.center.y -= Constants.UpdateBagButtonHeight
+            self.view.layoutIfNeeded()
+            }, completion: nil)
+    }
+    
+    func updatePurchaseCount(name: String, newValue: Int) {
+        producePurchaseCount[name] = newValue
+        print("updating count")
+        if !BagNeedsUpdating {
+            BagNeedsUpdating = true
+            showUpdateBagButton()
+        }
     }
 
     // MARK: - Table view data source
@@ -40,35 +79,14 @@ class FarmCurrentProduceTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("produceCell", forIndexPath: indexPath) as? ProduceTableViewCell
-        cell?.ProduceName.text = produceList[indexPath.row]["ProduceName"] as? String
-        let price = produceList[indexPath.row]["Price"] as? String
-        print(price)
-        cell?.Price.text = produceList[indexPath.row]["Price"] as? String
+        let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath) as? ProduceTableViewCell
+        cell?.ProduceName.text = produceList[indexPath.row][Constants.produceNameKey] as? String
+        cell?.Price.text = produceList[indexPath.row][Constants.priceKey] as? String
+        cell?.delegate = self
         // Configure the cell...
         
         return cell!
     }
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
 
     /*
     // Override to support rearranging the table view.
@@ -85,14 +103,15 @@ class FarmCurrentProduceTableViewController: UITableViewController {
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+
     }
-    */
+
 
 }

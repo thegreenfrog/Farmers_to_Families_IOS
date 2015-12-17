@@ -77,6 +77,10 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
         
         return cell
     }
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        performSegueWithIdentifier("showFarmDetail", sender: self)
+    }
 
 
     /*
@@ -145,15 +149,14 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
                     destination.farms = self.filteredFarmSearch
                 }
             } else if identifier == "showFarmDetail" {
-                if let navCont = segue.destinationViewController as? UINavigationController {
-                    if let destination = navCont.topViewController as? FarmDetailTableViewController {
-                        if let row = self.tableView.indexPathForSelectedRow?.row {
-                            let farm = filteredFarmSearch[row]
-                            destination.farmDetails = farm
-                            destination.navigationController?.title = farm.title
-                        }
+                if let destination = segue.destinationViewController as? FarmDetailTableViewController {
+                    if let row = self.tableView.indexPathForSelectedRow?.row {
+                        let farm = filteredFarmSearch[row]
+                        destination.farmDetails = farm
+                        destination.navigationController?.title = farm.title
                     }
                 }
+                
             }
         }
     }
