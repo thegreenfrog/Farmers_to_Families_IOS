@@ -13,20 +13,20 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
     struct Constants {
         static let priceKey = "price"
         static let produceNameKey = "produceName"
+        static let produceFarmKey = "farm"
+        static let produceNumKey = "produceCount"
+        static let producePurchasedStatusKey = "purchased"
         static let cellIdentifier = "produceCell"
         static let UpdateBagButtonHeight = CGFloat(50.0)
     }
-    
-    var produceList = [PFObject]()
+    //should not allow for multiple produce names. Fucks up key/value pair a
+    var produceList = [(PFObject, Int)]()
     var producePurchaseCount = [String: Int]()
     var BagNeedsUpdating = false
     var UpdateBagButton: UIButton?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        for produce in produceList {
-            producePurchaseCount[produce[Constants.produceNameKey] as! String] = 0
-        }
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -40,6 +40,40 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
     }
     
     @IBAction func UpdateBagAction(sender: UIButton) {
+        let navController = self.tabBarController?.viewControllers![2] as! UINavigationController
+        let groceryVC = navController.topViewController as! GroceryBagTableViewController
+        var iterator = 0
+        for produce in produceList {
+            if produce.1 > 0 {
+                let userProduceInstance = PFObject(className: "userQueuedProduce")
+                userProduceInstance[Constants.produceNameKey] = produce.0[Constants.produceNameKey]
+                userProduceInstance[Constants.produceNumKey] = produce.1
+                userProduceInstance[Constants.produceFarmKey] = produce.0[Constants.produceFarmKey]
+                userProduceInstance[Constants.producePurchasedStatusKey] = false
+                groceryVC.produceList.append(userProduceInstance)
+                produceList[iterator].1 = 0
+            }
+            iterator++
+        }
+        groceryVC.tableView.reloadData()
+        print("updated bag")
+        BagNeedsUpdating = false
+//        UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+//            self.UpdateBagButton?.center = CGPoint(x: CGFloat(self.view.bounds.maxX - 50), y: CGFloat(self.view.bounds.maxY - 50))
+//            self.UpdateBagButton?.frame = CGRectMake(self.view.bounds.maxX - 50, self.view.bounds.maxY - 50, 10, 1)
+//            self.view.layoutIfNeeded()
+//            }, completion: { (value: Bool) in
+//                self.UpdateBagButton?.removeFromSuperview()
+//                self.UpdateBagButton = nil
+//        })
+        UIView.animateWithDuration(2.0, delay: 0.0, usingSpringWithDamping: 0.3, initialSpringVelocity: 2.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+            self.UpdateBagButton?.center = CGPoint(x: CGFloat(self.view.bounds.maxX - 50), y: CGFloat(self.view.bounds.maxY - 50))
+            self.UpdateBagButton?.frame = CGRectMake(self.view.bounds.maxX - 50, self.view.bounds.maxY - 50, 10, 1)
+            self.view.layoutIfNeeded()
+            }, completion: { (value: Bool) in
+                self.UpdateBagButton?.removeFromSuperview()
+                self.UpdateBagButton = nil
+        })
         
     }
     
@@ -57,8 +91,8 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
             }, completion: nil)
     }
     
-    func updatePurchaseCount(name: String, newValue: Int) {
-        producePurchaseCount[name] = newValue
+    func updatePurchaseCount(index: Int, newValue: Int) {
+        produceList[index].1 = newValue
         print("updating count")
         if !BagNeedsUpdating {
             BagNeedsUpdating = true
@@ -80,8 +114,9 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath) as? ProduceTableViewCell
-        cell?.ProduceName.text = produceList[indexPath.row][Constants.produceNameKey] as? String
-        cell?.Price.text = produceList[indexPath.row][Constants.priceKey] as? String
+        cell?.ProduceName.text = produceList[indexPath.row].0[Constants.produceNameKey] as? String
+        cell?.Price.text = produceList[indexPath.row].0[Constants.priceKey] as? String
+        cell?.rowNum = indexPath.row
         cell?.delegate = self
         // Configure the cell...
         

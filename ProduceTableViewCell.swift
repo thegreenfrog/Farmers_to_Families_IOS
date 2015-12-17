@@ -9,7 +9,7 @@
 import UIKit
 
 protocol ChangingPurchaseQueueDelegate {
-    func updatePurchaseCount(name: String, newValue: Int)
+    func updatePurchaseCount(index: Int, newValue: Int)
 }
 
 class ProduceTableViewCell: UITableViewCell {
@@ -17,10 +17,11 @@ class ProduceTableViewCell: UITableViewCell {
     @IBAction func ChangeTotal(sender: UIStepper) {
         
         totalNumInBagQueue.text = Int(sender.value).description
-        delegate!.updatePurchaseCount(ProduceName.text!, newValue: Int(sender.value))
+        delegate!.updatePurchaseCount(rowNum!, newValue: Int(sender.value))
         print(totalNumInBagQueue.text)
     }
     
+    var rowNum: Int?
     @IBOutlet weak var ProduceName: UILabel!
     @IBOutlet weak var Price: UILabel!
     @IBOutlet weak var totalNumInBagQueue: UILabel!

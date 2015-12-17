@@ -159,7 +159,10 @@ class FarmDetailTableViewController: UITableViewController {
             query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
                 if error == nil {
                     if let objects = objects {
-                        produceVC.produceList = objects
+                        for object in objects {
+                            produceVC.produceList.append((object, 0))
+                        }
+                        
                         produceVC.tableView.reloadData()
                     }
                 }
