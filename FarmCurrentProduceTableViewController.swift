@@ -21,7 +21,6 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
     }
     //should not allow for multiple produce names. Fucks up key/value pair a
     var produceList = [(PFObject, Int)]()
-    var producePurchaseCount = [String: Int]()
     var BagNeedsUpdating = false
     var UpdateBagButton: UIButton?
     
@@ -55,6 +54,7 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
             }
             iterator++
         }
+        self.tableView.reloadData()
         groceryVC.tableView.reloadData()
         print("updated bag")
         BagNeedsUpdating = false
@@ -116,6 +116,7 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath) as? ProduceTableViewCell
         cell?.ProduceName.text = produceList[indexPath.row].0[Constants.produceNameKey] as? String
         cell?.Price.text = produceList[indexPath.row].0[Constants.priceKey] as? String
+        cell?.stepperLabel.value = 0
         cell?.rowNum = indexPath.row
         cell?.delegate = self
         // Configure the cell...

@@ -835,6 +835,7 @@
                                 <connections>
                                     <outlet property="Price" destination="PNI-y2-Szz" id="fbn-Eb-00G"/>
                                     <outlet property="ProduceName" destination="Jjo-eM-I93" id="I0j-6N-3lL"/>
+                                    <outlet property="stepperLabel" destination="AHo-gS-gsq" id="KdL-VF-bmb"/>
                                     <outlet property="totalNumInBagQueue" destination="gSX-Wa-cRr" id="YKQ-wV-kh6"/>
                                 </connections>
                             </tableViewCell>

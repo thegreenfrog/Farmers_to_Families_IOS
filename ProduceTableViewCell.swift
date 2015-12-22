@@ -21,6 +21,7 @@ class ProduceTableViewCell: UITableViewCell {
         print(totalNumInBagQueue.text)
     }
     
+    @IBOutlet weak var stepperLabel: UIStepper!
     var rowNum: Int?
     @IBOutlet weak var ProduceName: UILabel!
     @IBOutlet weak var Price: UILabel!

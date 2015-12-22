@@ -60,6 +60,37 @@ class GroceryBagTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    override func setEditing(editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        self.tableView.setEditing(editing, animated: animated)
+    }
+    
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.Delete {
+            produceList.removeAtIndex(indexPath.row)
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
+            if produceList.count == 0 {
+                animateButtonDisappear()
+            }
+        }
+    }
+    
+    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+        if self.tableView.editing {
+            return UITableViewCellEditingStyle.Delete
+        }
+        return UITableViewCellEditingStyle.None
+    }
+    
+    func animateButtonDisappear() {
+        UIView.animateWithDuration(1.0, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+            self.CheckoutButton?.center.y += 50
+            }, completion: {(value: Bool) in
+                self.CheckoutButton?.removeFromSuperview()
+                self.CheckoutButton = nil
+        })
+    }
+    
     func ExecuteCheckout() {
         for produce in produceList {
             produce[Constants.producePurchasedStatusKey] = true
@@ -76,12 +107,7 @@ class GroceryBagTableViewController: UITableViewController {
             style: UIAlertActionStyle.Default)
             { (action: UIAlertAction) -> Void in
                 self.ExecuteCheckout()
-                UIView.animateWithDuration(1.0, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
-                        self.CheckoutButton?.center.y += 50
-                    }, completion: {(value: Bool) in
-                        self.CheckoutButton?.removeFromSuperview()
-                        self.CheckoutButton = nil
-                })
+                self.animateButtonDisappear()
             }
         )
         alert.addAction(UIAlertAction(
