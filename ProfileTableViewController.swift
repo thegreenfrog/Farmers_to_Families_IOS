@@ -12,8 +12,8 @@ class ProfileTableViewController: UITableViewController {
 
     // MARK: - Variables and Constants
     
-    let tabLabels = ["Edit Information"]//"Change Location", "Orders"
-    let segueIdentifiers = ["changeUserInfo"]//"changeLocation", "seeOrders"
+    let TabLabels = [["Starred", "Order History"],["Edit Information"]]
+    let segueIdentifiers = [["seeStarred", "seeOrders"], ["changeUserInfo"]]//"changeLocation", "seeOrders"
     
     @IBAction func signInLogOutAction(sender: UIBarButtonItem) {
         if sender.title == Constants.signIn {
@@ -98,7 +98,7 @@ class ProfileTableViewController: UITableViewController {
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 1
+        return 2
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -115,7 +115,7 @@ class ProfileTableViewController: UITableViewController {
                 self.title = "No Name"
             }
             signInLogOutButton.title = Constants.logOut
-            return tabLabels.count
+            return TabLabels[section].count
         }
         
     }
@@ -123,7 +123,7 @@ class ProfileTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath)
-        cell.textLabel?.text = tabLabels[indexPath.row]
+        cell.textLabel?.text = TabLabels[indexPath.section][indexPath.row]
         cell.accessoryType = .DisclosureIndicator
         // Configure the cell...
 
@@ -131,7 +131,7 @@ class ProfileTableViewController: UITableViewController {
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        performSegueWithIdentifier(segueIdentifiers[indexPath.row], sender: self)
+        performSegueWithIdentifier(segueIdentifiers[indexPath.section][indexPath.row], sender: self)
         tableView.cellForRowAtIndexPath(indexPath)?.selected = false
     }
 
@@ -177,6 +177,21 @@ class ProfileTableViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "seeOrders" {
+            let ordersVC = segue.destinationViewController as! OrderHistoryTableViewController
+            let query = PFQuery(className: "userOrder")
+            query.whereKey("user", equalTo: PFUser.currentUser()!.username!)
+            query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
+                if error == nil {
+                    if let objects = objects {
+                        for object in objects {
+                            ordersVC.orders.append(object)
+                        }
+                        ordersVC.tableView.reloadData()
+                    }
+                }
+            })
+        }
     }
 
 

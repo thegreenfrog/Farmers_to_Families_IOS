@@ -92,10 +92,14 @@ class GroceryBagTableViewController: UITableViewController {
     }
     
     func ExecuteCheckout() {
+        let orderObject = PFObject.init(className: "userOrder")
+        orderObject.setObject(PFUser.currentUser()!.username!, forKey: "user")
         for produce in produceList {
             produce[Constants.producePurchasedStatusKey] = true
             produce.saveInBackground()
         }
+        orderObject.addObjectsFromArray(produceList, forKey: "produce")
+        orderObject.saveInBackground()
         produceList = []
         self.tableView.reloadData()
     }
