@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Parse
 
 class ProfileTableViewController: UITableViewController {
 
@@ -172,6 +173,24 @@ class ProfileTableViewController: UITableViewController {
 
     
     // MARK: - Navigation
+    
+    func getProduceInOrder(object: PFObject, ordersVC: OrderHistoryTableViewController) {
+        print(object.objectId)
+        let relation = object.relationForKey("purchased")
+        let query = relation.query()
+        
+        query!.findObjectsInBackgroundWithBlock( { (results, error) in
+            if error == nil {
+                print(results?.count)
+                if let produceList = results {
+                    ordersVC.producePerOrder.append(produceList)
+                    ordersVC.orders.append(object)
+                    ordersVC.tableView.reloadData()
+                }
+            }
+            
+        })
+    }
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -180,19 +199,19 @@ class ProfileTableViewController: UITableViewController {
         if segue.identifier == "seeOrders" {
             let ordersVC = segue.destinationViewController as! OrderHistoryTableViewController
             let query = PFQuery(className: "userOrder")
-            query.whereKey("user", equalTo: PFUser.currentUser()!.username!)
+            let currentUser = PFUser.currentUser()!.username!
+            query.whereKey("user", equalTo: currentUser)
+            //print(currentUser)
             query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
                 if error == nil {
                     if let objects = objects {
                         for object in objects {
-                            ordersVC.orders.append(object)
+                            self.getProduceInOrder(object, ordersVC: ordersVC)
                         }
-                        ordersVC.tableView.reloadData()
+                        
                     }
                 }
             })
         }
     }
-
-
 }

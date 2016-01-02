@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Parse
 
 class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurchaseQueueDelegate {
 
@@ -56,7 +57,6 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
         }
         self.tableView.reloadData()
         groceryVC.tableView.reloadData()
-        print("updated bag")
         BagNeedsUpdating = false
 //        UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
 //            self.UpdateBagButton?.center = CGPoint(x: CGFloat(self.view.bounds.maxX - 50), y: CGFloat(self.view.bounds.maxY - 50))
@@ -78,7 +78,6 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
     }
     
     func showUpdateBagButton() {
-        print("showing update button")
         UpdateBagButton = UIButton()
         UpdateBagButton!.setTitle("Update Grocery Bag", forState: .Normal)
         UpdateBagButton!.frame = CGRectMake(0, self.view.bounds.maxY - self.tabBarController!.tabBar.frame.height, self.view.bounds.width, Constants.UpdateBagButtonHeight)
@@ -93,7 +92,6 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
     
     func updatePurchaseCount(index: Int, newValue: Int) {
         produceList[index].1 = newValue
-        print("updating count")
         if !BagNeedsUpdating {
             BagNeedsUpdating = true
             showUpdateBagButton()

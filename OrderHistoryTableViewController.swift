@@ -7,10 +7,12 @@
 //
 
 import UIKit
+import Parse
 
 class OrderHistoryTableViewController: UITableViewController {
 
     var orders = [PFObject]()
+    var producePerOrder = [[PFObject]]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,15 +37,30 @@ class OrderHistoryTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return orders[section]["produce"].count
+        print(producePerOrder[section].count)
+        return producePerOrder[section].count
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath)
-
-        cell.textLabel?.text = orders[indexPath.section]["produce"].objectAtIndex(indexPath.row) as? String
+        let cell = tableView.dequeueReusableCellWithIdentifier("orderHistory", forIndexPath: indexPath)
+        //print(orders[indexPath.section].valueForKey("produce")![indexPath.row]["produceName"] as? String)
+        let produce = producePerOrder[indexPath.section][indexPath.row]
+        cell.textLabel?.text = produce.valueForKey("produceName") as? String
 
         return cell
+    }
+    
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let date = orders[section].createdAt!
+//        let components = NSCalendar.currentCalendar().components([NSCalendarUnit.Day, NSCalendarUnit.Month, NSCalendarUnit.Year], fromDate: date)
+//        let day = components.day
+//        let dateformatter = NSDateFormatter()
+//        let month = dateformatter.monthSymbols[components.month]
+//        let year = components.year
+//        return "Date: \(month) \(day), \(year)"
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        return dateFormatter.stringFromDate(date)
     }
     
 

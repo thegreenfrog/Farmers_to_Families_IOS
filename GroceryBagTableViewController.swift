@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Parse
 
 class GroceryBagTableViewController: UITableViewController {
 
@@ -20,16 +21,10 @@ class GroceryBagTableViewController: UITableViewController {
     
     var CheckoutButton: UIButton?
     
-    var produceList = [PFObject]() {
-        didSet {
-            print("added to list")
-        }
-    }
+    var produceList = [PFObject]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -94,12 +89,25 @@ class GroceryBagTableViewController: UITableViewController {
     func ExecuteCheckout() {
         let orderObject = PFObject.init(className: "userOrder")
         orderObject.setObject(PFUser.currentUser()!.username!, forKey: "user")
-        for produce in produceList {
+        let orderRelation = orderObject.relationForKey("purchased")
+        var totalProduce = self.produceList.count
+        for produce in self.produceList {
             produce[Constants.producePurchasedStatusKey] = true
-            produce.saveInBackground()
+            let purchasedProduce = PFObject.init(className: "producePurchased")
+            purchasedProduce.setValue(produce.valueForKey(Constants.produceNameKey), forKey: Constants.produceNameKey)
+            purchasedProduce.setValue(produce.valueForKey(Constants.produceFarmKey), forKey: Constants.produceFarmKey)
+            purchasedProduce.setValue(produce.valueForKey(Constants.produceNumKey), forKey: Constants.produceNumKey)
+            purchasedProduce.setValue(PFUser.currentUser()!.username!, forKey: "user")
+            purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
+                if success {
+                    orderRelation.addObject(purchasedProduce)
+                }
+                totalProduce--
+                if totalProduce == 0 {
+                    orderObject.saveInBackground()
+                }
+            }
         }
-        orderObject.addObjectsFromArray(produceList, forKey: "produce")
-        orderObject.saveInBackground()
         produceList = []
         self.tableView.reloadData()
     }
