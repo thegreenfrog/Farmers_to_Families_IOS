@@ -84,6 +84,13 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
         UpdateBagButton!.addTarget(self, action: "UpdateBagAction:", forControlEvents: .TouchUpInside)
         UpdateBagButton?.backgroundColor = UIColor.blackColor()
         self.view.addSubview(UpdateBagButton!)
+        let rightConstraint = NSLayoutConstraint(item: UpdateBagButton!, attribute: NSLayoutAttribute.TrailingMargin, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.TrailingMargin, multiplier: 1, constant: 0)
+        self.view.addConstraint(rightConstraint)
+        let leftConstraint = NSLayoutConstraint(item: self.view, attribute: NSLayoutAttribute.LeadingMargin, relatedBy: NSLayoutRelation.Equal, toItem: UpdateBagButton, attribute: NSLayoutAttribute.LeadingMargin, multiplier: 1, constant: 0)
+        self.view.addConstraint(leftConstraint)
+        let bottomConstraint = NSLayoutConstraint(item: self.view, attribute: NSLayoutAttribute.BottomMargin, relatedBy: NSLayoutRelation.Equal, toItem: UpdateBagButton, attribute: NSLayoutAttribute.BottomMargin, multiplier: 1, constant: 0)
+        self.view.addConstraint(bottomConstraint)
+        
         UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
             self.UpdateBagButton!.center.y -= Constants.UpdateBagButtonHeight
             self.view.layoutIfNeeded()

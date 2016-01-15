@@ -294,7 +294,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="orderHistory" id="yJb-LH-bVa" customClass="OrderHistoryTableViewCell" customModule="LocalFarming" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="orderHistory" id="yJb-LH-bVa" customClass="OrderHistoryTableViewCell" customModule="LocalFarming" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="92" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="yJb-LH-bVa" id="xzk-Pj-A2C">
@@ -312,7 +312,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wZU-9o-81L" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2701" y="531"/>
+            <point key="canvasLocation" x="4416" y="1286"/>
         </scene>
         <!--Change Acount Settings View Controller-->
         <scene sceneID="ce0-pw-49N">
@@ -648,7 +648,25 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1tO-jO-eHx" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="bw5-u2-d28" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="4753" y="1658"/>
+            <point key="canvasLocation" x="3957" y="1614"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="Leg-ZA-8KZ">
+            <objects>
+                <viewController id="e0g-cw-dnI" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="b1n-j5-w3F"/>
+                        <viewControllerLayoutGuide type="bottom" id="rQt-JI-wkt"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Z2u-Ce-Vm6">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="MiC-db-CWh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3957" y="2292"/>
         </scene>
         <!--Website View Controller-->
         <scene sceneID="cEQ-2A-XHK">
@@ -803,7 +821,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Z47-dK-f0H" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2711" y="1493"/>
+            <point key="canvasLocation" x="1917" y="1627"/>
         </scene>
         <!--Farm Current Produce Table View Controller-->
         <scene sceneID="DgV-2s-ntd">
@@ -876,10 +894,13 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="nKu-jh-hOn"/>
+                    <connections>
+                        <segue destination="e0g-cw-dnI" kind="show" identifier="showIndividualProduce" id="2c4-lO-mWw"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NPx-Ui-OTO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4880" y="2360"/>
+            <point key="canvasLocation" x="3256" y="2292"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="eJf-zK-DxT">
@@ -897,7 +918,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ByR-4Q-ida" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4068" y="1658"/>
+            <point key="canvasLocation" x="3256" y="1614"/>
         </scene>
         <!--Grocery Bag-->
         <scene sceneID="GhO-QL-AW3">

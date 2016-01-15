@@ -12,6 +12,7 @@ import Parse
 class GroceryBagTableViewController: UITableViewController {
 
     struct Constants {
+        static let ParseCurrentProduceClassName = "AvailableProduce"
         static let produceNameKey = "produceName"
         static let produceFarmKey = "farm"
         static let produceNumKey = "produceCount"
@@ -46,6 +47,13 @@ class GroceryBagTableViewController: UITableViewController {
             CheckoutButton?.center.y -= 50
             CheckoutButton?.backgroundColor = UIColor.blackColor()
             self.view.addSubview(CheckoutButton!)
+            
+            let rightConstraint = NSLayoutConstraint(item: CheckoutButton!, attribute: NSLayoutAttribute.TrailingMargin, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.TrailingMargin, multiplier: 1, constant: 0)
+            self.view.addConstraint(rightConstraint)
+            let leftConstraint = NSLayoutConstraint(item: self.view, attribute: NSLayoutAttribute.LeadingMargin, relatedBy: NSLayoutRelation.Equal, toItem: CheckoutButton, attribute: NSLayoutAttribute.LeadingMargin, multiplier: 1, constant: 0)
+            self.view.addConstraint(leftConstraint)
+            let bottomConstraint = NSLayoutConstraint(item: self.view, attribute: NSLayoutAttribute.BottomMargin, relatedBy: NSLayoutRelation.Equal, toItem: CheckoutButton, attribute: NSLayoutAttribute.BottomMargin, multiplier: 1, constant: 0)
+            self.view.addConstraint(bottomConstraint)
         }
 
     }
@@ -92,21 +100,36 @@ class GroceryBagTableViewController: UITableViewController {
         let orderRelation = orderObject.relationForKey("purchased")
         var totalProduce = self.produceList.count
         for produce in self.produceList {
-            produce[Constants.producePurchasedStatusKey] = true
-            let purchasedProduce = PFObject.init(className: "producePurchased")
-            purchasedProduce.setValue(produce.valueForKey(Constants.produceNameKey), forKey: Constants.produceNameKey)
-            purchasedProduce.setValue(produce.valueForKey(Constants.produceFarmKey), forKey: Constants.produceFarmKey)
-            purchasedProduce.setValue(produce.valueForKey(Constants.produceNumKey), forKey: Constants.produceNumKey)
-            purchasedProduce.setValue(PFUser.currentUser()!.username!, forKey: "user")
-            purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
-                if success {
-                    orderRelation.addObject(purchasedProduce)
+            //retrieve updated produce information
+            let produceQuantity = produce[Constants.produceNumKey] as! Int
+            let objectQuery = PFQuery(className: Constants.ParseCurrentProduceClassName)
+            objectQuery.whereKey("objectId", equalTo: produce.objectId!)
+            objectQuery.getFirstObjectInBackgroundWithBlock{ (object, error) in
+                //check to make sure object still exists, enough inventory to make purchase
+                if error != nil || object == nil || (object?.valueForKey("units") as! Int) < produceQuantity{
+                    //notify user purchase could not be done
                 }
-                totalProduce--
-                if totalProduce == 0 {
-                    orderObject.saveInBackground()
+                object!.incrementKey("units", byAmount: -produceQuantity)
+                object!.setObject(true, forKey: Constants.producePurchasedStatusKey)
+                object!.saveInBackground()
+                produce[Constants.producePurchasedStatusKey] = true
+                //create purchase history
+                let purchasedProduce = PFObject.init(className: "producePurchased")
+                purchasedProduce.setValue(produce.valueForKey(Constants.produceNameKey), forKey: Constants.produceNameKey)
+                purchasedProduce.setValue(produce.valueForKey(Constants.produceFarmKey), forKey: Constants.produceFarmKey)
+                purchasedProduce.setValue(produce.valueForKey(Constants.produceNumKey), forKey: Constants.produceNumKey)
+                purchasedProduce.setValue(PFUser.currentUser()!.username!, forKey: "user")
+                purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
+                    if success {
+                        orderRelation.addObject(purchasedProduce)
+                    }
+                    totalProduce--
+                    if totalProduce == 0 {
+                        orderObject.saveInBackground()
+                    }
                 }
             }
+            
         }
         produceList = []
         self.tableView.reloadData()

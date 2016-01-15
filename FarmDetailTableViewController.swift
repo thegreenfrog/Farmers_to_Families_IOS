@@ -152,7 +152,7 @@ class FarmDetailTableViewController: UITableViewController {
     }
     
     func showCurrentProduce(segue: UIStoryboardSegue) {
-            if let produceVC = segue.destinationViewController as? FarmCurrentProduceTableViewController {
+        if let produceVC = segue.destinationViewController as? FarmCurrentProduceTableViewController {
             produceVC.title = farmDetails?.title
             let query = PFQuery(className: Constants.ParseCurrentProduceClassName)
             query.whereKey(Constants.ParseFarmPhotoFarmKey, equalTo: (farmDetails?.title)!)
