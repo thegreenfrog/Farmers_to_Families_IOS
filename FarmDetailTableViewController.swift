@@ -17,11 +17,6 @@ class FarmDetailTableViewController: UITableViewController {
         static let showWebSegueIdentifier = "showWebsite"
         static let showPictureSegueIdentifier = "showPictures"
         static let showCurrentProduceSegueIdentifier = "showCurrentProduce"
-        static let ParseFarmPhotoClassName = "FarmPhotos"
-        static let ParseFarmPhotoFarmKey = "farm"
-        static let ParseFarmPhotoImageKey = "image"
-        static let ParseCurrentProduceClassName = "AvailableProduce"
-        static let ParseCurrentProducePurchasedKey = "purchased"
     }
     
     var farmDetails: LocalFarm?
@@ -130,14 +125,14 @@ class FarmDetailTableViewController: UITableViewController {
         let destination = segue.destinationViewController as? UINavigationController
         if let photoCollectionVC = destination?.topViewController as? FarmPhotoCollectionViewController {
             photoCollectionVC.farmName = farmDetails
-            let query = PFQuery(className: Constants.ParseFarmPhotoClassName)
-            query.whereKey(Constants.ParseFarmPhotoFarmKey, equalTo: (farmDetails?.title)!)
+            let query = PFQuery(className: ParseKeys.FarmPhotoClassName)
+            query.whereKey(ParseKeys.FarmPhotoFarmKey, equalTo: (farmDetails?.title)!)
             query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
                 if error != nil ||  objects == nil{
                     return
                 }
                 for object in objects! {
-                    if let image = object[Constants.ParseFarmPhotoImageKey] as? PFFile {
+                    if let image = object[ParseKeys.FarmPhotoImageKey] as? PFFile {
                         image.getDataInBackgroundWithBlock({ (imageData: NSData?, error: NSError?) -> Void in
                             if (error == nil) {
                                 photoCollectionVC.userPhotos.append(UIImage(data: imageData!)!)
@@ -154,9 +149,9 @@ class FarmDetailTableViewController: UITableViewController {
     func showCurrentProduce(segue: UIStoryboardSegue) {
         if let produceVC = segue.destinationViewController as? FarmCurrentProduceTableViewController {
             produceVC.title = farmDetails?.title
-            let query = PFQuery(className: Constants.ParseCurrentProduceClassName)
-            query.whereKey(Constants.ParseFarmPhotoFarmKey, equalTo: (farmDetails?.title)!)
-            query.whereKey(Constants.ParseCurrentProducePurchasedKey, notEqualTo: true)
+            let query = PFQuery(className: ParseKeys.CurrentProduceClassName)
+            query.whereKey(ParseKeys.FarmPhotoFarmKey, equalTo: (farmDetails?.title)!)
+            query.whereKey(ParseKeys.ProducePurchasedStatusKey, notEqualTo: true)
             query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
                 if error == nil {
                     if let objects = objects {

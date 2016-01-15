@@ -12,11 +12,7 @@ import Parse
 class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurchaseQueueDelegate {
 
     struct Constants {
-        static let priceKey = "price"
-        static let produceNameKey = "produceName"
-        static let produceFarmKey = "farm"
-        static let produceNumKey = "produceCount"
-        static let producePurchasedStatusKey = "purchased"
+
         static let cellIdentifier = "produceCell"
         static let UpdateBagButtonHeight = CGFloat(50.0)
     }
@@ -46,10 +42,10 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
         for produce in produceList {
             if produce.1 > 0 {
                 let userProduceInstance = PFObject(className: "userQueuedProduce")
-                userProduceInstance[Constants.produceNameKey] = produce.0[Constants.produceNameKey]
-                userProduceInstance[Constants.produceNumKey] = produce.1
-                userProduceInstance[Constants.produceFarmKey] = produce.0[Constants.produceFarmKey]
-                userProduceInstance[Constants.producePurchasedStatusKey] = false
+                userProduceInstance[ParseKeys.ProduceNameKey] = produce.0[ParseKeys.ProduceNameKey]
+                userProduceInstance[ParseKeys.ProduceNumKey] = produce.1
+                userProduceInstance[ParseKeys.ProduceFarmKey] = produce.0[ParseKeys.ProduceFarmKey]
+                userProduceInstance[ParseKeys.ProducePurchasedStatusKey] = false
                 groceryVC.produceList.append(userProduceInstance)
                 produceList[iterator].1 = 0
             }
@@ -119,8 +115,8 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath) as? ProduceTableViewCell
-        cell?.ProduceName.text = produceList[indexPath.row].0[Constants.produceNameKey] as? String
-        cell?.Price.text = produceList[indexPath.row].0[Constants.priceKey] as? String
+        cell?.ProduceName.text = produceList[indexPath.row].0[ParseKeys.ProduceNameKey] as? String
+        cell?.Price.text = produceList[indexPath.row].0[ParseKeys.ProducePriceKey] as? String
         cell?.stepperLabel.value = 0
         cell?.rowNum = indexPath.row
         cell?.delegate = self

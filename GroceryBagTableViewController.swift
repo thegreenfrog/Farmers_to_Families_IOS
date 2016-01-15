@@ -12,11 +12,7 @@ import Parse
 class GroceryBagTableViewController: UITableViewController {
 
     struct Constants {
-        static let ParseCurrentProduceClassName = "AvailableProduce"
-        static let produceNameKey = "produceName"
-        static let produceFarmKey = "farm"
-        static let produceNumKey = "produceCount"
-        static let producePurchasedStatusKey = "purchased"
+        static let cellIdentifier = "GroceryCell"
         static let CheckoutButtonHeight = CGFloat(50)
     }
     
@@ -26,7 +22,7 @@ class GroceryBagTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.tableView.tableFooterView = UIView()
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -95,30 +91,30 @@ class GroceryBagTableViewController: UITableViewController {
     }
     
     func ExecuteCheckout() {
-        let orderObject = PFObject.init(className: "userOrder")
-        orderObject.setObject(PFUser.currentUser()!.username!, forKey: "user")
-        let orderRelation = orderObject.relationForKey("purchased")
+        let orderObject = PFObject.init(className: ParseKeys.UserOrderClassName)
+        orderObject.setObject(PFUser.currentUser()!.username!, forKey: ParseKeys.UserOrderUser)
+        let orderRelation = orderObject.relationForKey(ParseKeys.UserOrderRelationKey)
         var totalProduce = self.produceList.count
         for produce in self.produceList {
             //retrieve updated produce information
-            let produceQuantity = produce[Constants.produceNumKey] as! Int
-            let objectQuery = PFQuery(className: Constants.ParseCurrentProduceClassName)
-            objectQuery.whereKey("objectId", equalTo: produce.objectId!)
+            let produceQuantity = produce[ParseKeys.ProduceNumKey] as! Int
+            let objectQuery = PFQuery(className: ParseKeys.CurrentProduceClassName)
+            objectQuery.whereKey(ParseKeys.PFObjectObjectID, equalTo: produce.objectId!)
             objectQuery.getFirstObjectInBackgroundWithBlock{ (object, error) in
                 //check to make sure object still exists, enough inventory to make purchase
-                if error != nil || object == nil || (object?.valueForKey("units") as! Int) < produceQuantity{
+                if error != nil || object == nil || (object?.valueForKey(ParseKeys.ProduceUnitsKey) as! Int) < produceQuantity{
                     //notify user purchase could not be done
                 }
-                object!.incrementKey("units", byAmount: -produceQuantity)
-                object!.setObject(true, forKey: Constants.producePurchasedStatusKey)
+                object!.incrementKey(ParseKeys.ProduceUnitsKey, byAmount: -produceQuantity)
+                object!.setObject(true, forKey: ParseKeys.ProducePurchasedStatusKey)
                 object!.saveInBackground()
-                produce[Constants.producePurchasedStatusKey] = true
+                produce[ParseKeys.ProducePurchasedStatusKey] = true
                 //create purchase history
-                let purchasedProduce = PFObject.init(className: "producePurchased")
-                purchasedProduce.setValue(produce.valueForKey(Constants.produceNameKey), forKey: Constants.produceNameKey)
-                purchasedProduce.setValue(produce.valueForKey(Constants.produceFarmKey), forKey: Constants.produceFarmKey)
-                purchasedProduce.setValue(produce.valueForKey(Constants.produceNumKey), forKey: Constants.produceNumKey)
-                purchasedProduce.setValue(PFUser.currentUser()!.username!, forKey: "user")
+                let purchasedProduce = PFObject.init(className: ParseKeys.UserOrderProduceClassName)
+                purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceNameKey), forKey: ParseKeys.ProduceNameKey)
+                purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceFarmKey), forKey: ParseKeys.ProduceFarmKey)
+                purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceNumKey), forKey: ParseKeys.ProduceNumKey)
+                purchasedProduce.setValue(PFUser.currentUser()!.username!, forKey: ParseKeys.UserOrderUser)
                 purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
                     if success {
                         orderRelation.addObject(purchasedProduce)
@@ -171,12 +167,12 @@ class GroceryBagTableViewController: UITableViewController {
 
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("GroceryCell", forIndexPath: indexPath) as! GroceryBagTableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath) as! GroceryBagTableViewCell
         let produce = produceList[indexPath.row]
-        cell.produceNameLabel.text = produce[Constants.produceNameKey] as? String
-        let produceNum = produce[Constants.produceNumKey] as? Int
+        cell.produceNameLabel.text = produce[ParseKeys.ProduceNameKey] as? String
+        let produceNum = produce[ParseKeys.ProduceNumKey] as? Int
         cell.produceCountLabel.text = "\(produceNum!)"
-        cell.farmNameLabel.text = produce[Constants.produceFarmKey] as? String
+        cell.farmNameLabel.text = produce[ParseKeys.ProduceFarmKey] as? String
         
         return cell
     }
