@@ -23,11 +23,7 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        self.tableView.tableFooterView = UIView()
     }
 
     override func didReceiveMemoryWarning() {
@@ -39,12 +35,13 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
         let navController = self.tabBarController?.viewControllers![2] as! UINavigationController
         let groceryVC = navController.topViewController as! GroceryBagTableViewController
         var iterator = 0
-        for produce in produceList {
-            if produce.1 > 0 {
+        for (produce, num) in produceList {
+            if num > 0 {
                 let userProduceInstance = PFObject(className: "userQueuedProduce")
-                userProduceInstance[ParseKeys.ProduceNameKey] = produce.0[ParseKeys.ProduceNameKey]
-                userProduceInstance[ParseKeys.ProduceNumKey] = produce.1
-                userProduceInstance[ParseKeys.ProduceFarmKey] = produce.0[ParseKeys.ProduceFarmKey]
+                userProduceInstance.objectId = produce.objectId
+                userProduceInstance[ParseKeys.ProduceNameKey] = produce[ParseKeys.ProduceNameKey]
+                userProduceInstance[ParseKeys.ProduceNumKey] = num
+                userProduceInstance[ParseKeys.ProduceFarmKey] = produce[ParseKeys.ProduceFarmKey]
                 userProduceInstance[ParseKeys.ProducePurchasedStatusKey] = false
                 groceryVC.produceList.append(userProduceInstance)
                 produceList[iterator].1 = 0
@@ -54,14 +51,6 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
         self.tableView.reloadData()
         groceryVC.tableView.reloadData()
         BagNeedsUpdating = false
-//        UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
-//            self.UpdateBagButton?.center = CGPoint(x: CGFloat(self.view.bounds.maxX - 50), y: CGFloat(self.view.bounds.maxY - 50))
-//            self.UpdateBagButton?.frame = CGRectMake(self.view.bounds.maxX - 50, self.view.bounds.maxY - 50, 10, 1)
-//            self.view.layoutIfNeeded()
-//            }, completion: { (value: Bool) in
-//                self.UpdateBagButton?.removeFromSuperview()
-//                self.UpdateBagButton = nil
-//        })
         UIView.animateWithDuration(2.0, delay: 0.0, usingSpringWithDamping: 0.3, initialSpringVelocity: 2.0, options: UIViewAnimationOptions.CurveLinear, animations: {
             self.UpdateBagButton?.center = CGPoint(x: CGFloat(self.view.bounds.maxX - 50), y: CGFloat(self.view.bounds.maxY - 50))
             self.UpdateBagButton?.frame = CGRectMake(self.view.bounds.maxX - 50, self.view.bounds.maxY - 50, 10, 1)
@@ -116,13 +105,16 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath) as? ProduceTableViewCell
         cell?.ProduceName.text = produceList[indexPath.row].0[ParseKeys.ProduceNameKey] as? String
-        cell?.Price.text = produceList[indexPath.row].0[ParseKeys.ProducePriceKey] as? String
-        cell?.stepperLabel.value = 0
+        let price = produceList[indexPath.row].0[ParseKeys.ProducePriceKey] as! Float
+        cell?.Price.text = "$\(price)"
         cell?.rowNum = indexPath.row
         cell?.delegate = self
-        // Configure the cell...
         
         return cell!
+    }
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        performSegueWithIdentifier("showIndividualProduce", sender: indexPath.row)
     }
 
     /*
@@ -147,7 +139,13 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-
+        if let destVC = segue.destinationViewController as? IndividualProduceViewController {
+            let row = sender as! Int
+            let (produce, num) = produceList[row]
+                destVC.produceObject = produce
+                destVC.quantity = num
+            
+        }
     }
 
 

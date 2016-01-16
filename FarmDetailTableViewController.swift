@@ -150,7 +150,7 @@ class FarmDetailTableViewController: UITableViewController {
         if let produceVC = segue.destinationViewController as? FarmCurrentProduceTableViewController {
             produceVC.title = farmDetails?.title
             let query = PFQuery(className: ParseKeys.CurrentProduceClassName)
-            query.whereKey(ParseKeys.FarmPhotoFarmKey, equalTo: (farmDetails?.title)!)
+            query.whereKey(ParseKeys.ProduceFarmKey, equalTo: (farmDetails?.title)!)
             query.whereKey(ParseKeys.ProducePurchasedStatusKey, notEqualTo: true)
             query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
                 if error == nil {
@@ -176,7 +176,6 @@ class FarmDetailTableViewController: UITableViewController {
             destination?.webURL = farmDetails?.websiteURL
         } else if segue.identifier ==  Constants.showPictureSegueIdentifier{
             showPictures(segue)
-            
         } else if segue.identifier == Constants.showCurrentProduceSegueIdentifier {
             showCurrentProduce(segue)
         }

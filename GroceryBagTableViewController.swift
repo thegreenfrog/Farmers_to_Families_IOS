@@ -90,6 +90,21 @@ class GroceryBagTableViewController: UITableViewController {
         })
     }
     
+    func showCheckoutError(produce: String) {
+        let alert = UIAlertController(title: "Checkout Error", message: "\(produce) could not be bought. It will not be part of your bag", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(
+            title: "Ok",
+            style: UIAlertActionStyle.Default)
+            { (action: UIAlertAction) -> Void in
+                self.ExecuteCheckout()
+                self.animateButtonDisappear()
+            }
+        )
+        
+        presentViewController(alert, animated: true, completion: nil)
+
+    }
+    
     func ExecuteCheckout() {
         let orderObject = PFObject.init(className: ParseKeys.UserOrderClassName)
         orderObject.setObject(PFUser.currentUser()!.username!, forKey: ParseKeys.UserOrderUser)
@@ -104,6 +119,7 @@ class GroceryBagTableViewController: UITableViewController {
                 //check to make sure object still exists, enough inventory to make purchase
                 if error != nil || object == nil || (object?.valueForKey(ParseKeys.ProduceUnitsKey) as! Int) < produceQuantity{
                     //notify user purchase could not be done
+                    self.showCheckoutError(produce[ParseKeys.ProduceNameKey] as! String)
                 }
                 object!.incrementKey(ParseKeys.ProduceUnitsKey, byAmount: -produceQuantity)
                 object!.setObject(true, forKey: ParseKeys.ProducePurchasedStatusKey)
