@@ -73,6 +73,14 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         // Dispose of any resources that can be recreated.
     }
     
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
+    }
+    
+    override func shouldAutorotate() -> Bool {
+        return true
+    }
+    
     // MARK: - Storyboard UI Functions
     
     func textFieldDidBeginEditing(textField: UITextField) {

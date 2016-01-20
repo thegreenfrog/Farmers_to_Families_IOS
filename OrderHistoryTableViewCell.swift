@@ -9,6 +9,10 @@
 import UIKit
 
 class OrderHistoryTableViewCell: UITableViewCell {
+    @IBOutlet weak var produceLabel: UILabel!
+    @IBOutlet weak var farmLabel: UILabel!
+    @IBOutlet weak var unitsLabel: UILabel!
+    @IBOutlet weak var priceLabel: UILabel!
 
     override func awakeFromNib() {
         super.awakeFromNib()

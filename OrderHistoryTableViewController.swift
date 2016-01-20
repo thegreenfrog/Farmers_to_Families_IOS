@@ -42,11 +42,15 @@ class OrderHistoryTableViewController: UITableViewController {
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("orderHistory", forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCellWithIdentifier("orderHistory", forIndexPath: indexPath) as! OrderHistoryTableViewCell
         //print(orders[indexPath.section].valueForKey("produce")![indexPath.row]["produceName"] as? String)
         let produce = producePerOrder[indexPath.section][indexPath.row]
-        cell.textLabel?.text = produce.valueForKey("produceName") as? String
-
+        cell.produceLabel.text = produce.valueForKey(ParseKeys.ProduceNameKey) as? String
+        cell.farmLabel.text = produce.valueForKey(ParseKeys.ProduceFarmKey) as? String
+        let units = produce.valueForKey(ParseKeys.ProduceUnitsKey) as? Int
+        cell.unitsLabel.text = "\(units!) units"
+        let price = produce.valueForKey(ParseKeys.ProducePriceKey) as? Float
+        cell.priceLabel.text = "$\(price!)"
         return cell
     }
     

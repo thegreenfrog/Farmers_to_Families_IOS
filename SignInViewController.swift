@@ -50,9 +50,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        
-    }
-    
+    } 
     
     // MARK: - Storyboard UI Functions
     
