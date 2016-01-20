@@ -89,24 +89,29 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         UIView.animateWithDuration(1.0,
             animations: {updatingBagScreen.alpha = 1.0},
             completion: {finished in
+
                 //update bag
                 //add info to grocerybagVC
                 let navController = self.tabBarController?.viewControllers![2] as! UINavigationController
                 let groceryVC = navController.topViewController as! GroceryBagTableViewController
-                var iterator = 0
-                for produce in groceryVC.produceList {
-                    if produce.objectId == self.produceObject?.objectId {
-                        groceryVC.produceList[iterator].incrementKey(ParseKeys.ProduceUnitsKey, byAmount: 1)
+                for (index, produce) in groceryVC.produceList.enumerate() {
+                    let produceId = produce.valueForKey(ParseKeys.ProduceSourceObjectID) as? String
+                    if  produceId == self.produceObject?.objectId {
+                        groceryVC.produceList[index].incrementKey(ParseKeys.ProduceUnitsKey, byAmount: 1)
+                        groceryVC.produceList[index].saveInBackground()
+                        print(groceryVC.produceList[index].valueForKey(ParseKeys.ProduceUnitsKey))
                         self.animateHideUpdateScreen(groceryVC, updatingBagScreen: updatingBagScreen)
+                        groceryVC.tableView.reloadData()
                         return
                     }
-                    iterator++
                 }
                 groceryVC.produceList.append(self.createUnit())
                 groceryVC.tableView.reloadData()
                 self.animateHideUpdateScreen(groceryVC, updatingBagScreen: updatingBagScreen)
                 //animate in "bag updated" screen
         })
+        
+        
     }
     
     @IBAction func buyUnitAction(sender: UIButton) {
@@ -131,6 +136,19 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         setPriceTextField!.center.x = self.view.center.x
     }
     
+    func showQuantityStatus() {
+        if quantity > 5 {
+            quantityLabel.text = "In Stock"
+        } else {
+            quantityLabel.textColor = UIColor.redColor()
+            if quantity == 0 {
+                quantityLabel.text = "Out of Stock"
+            } else {
+                quantityLabel.text = "Low Stock"
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         let tap = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         self.view.addGestureRecognizer(tap)
@@ -140,7 +158,7 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         let price = produceObject![ParseKeys.ProducePriceKey] as? Float
         priceLabel.text = "\(price!)"
         self.title = produceObject![ParseKeys.ProduceFarmKey] as? String
-        quantityLabel.text = "\(quantity!)"
+        showQuantityStatus()
         
         if quantity == 0 {
             let labelFrame = CGRect(x: 0, y: self.view.bounds.height, width: self.view.bounds.width*2/3, height: 50)

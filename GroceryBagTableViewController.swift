@@ -35,7 +35,6 @@ class GroceryBagTableViewController: UITableViewController {
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        print(produceList.count)
         
         if(produceList.count > 0 && CheckoutButton == nil) {
             CheckoutButton = UIButton()
@@ -99,6 +98,12 @@ class GroceryBagTableViewController: UITableViewController {
         query.getFirstObjectInBackgroundWithBlock{ (object, error) in
             if error != nil || object == nil {
                 hasError = true
+                return
+            }
+            let units = object?.valueForKey(ParseKeys.ProduceUnitsKey) as! Int
+            if units > 1 {
+                object?.incrementKey(ParseKeys.ProduceUnitsKey, byAmount: -1)
+                object?.saveInBackground()
                 return
             }
             let orderId = object![ParseKeys.UserOrderId] as! String
@@ -245,6 +250,7 @@ class GroceryBagTableViewController: UITableViewController {
         let produce = produceList[indexPath.row]
         cell.produceNameLabel.text = produce[ParseKeys.ProduceNameKey] as? String
         let produceNum = produce[ParseKeys.ProduceUnitsKey] as? Int
+        print(produceNum)
         cell.produceCountLabel.text = "\(produceNum!)"
         let price = produce[ParseKeys.ProducePriceKey] as? Float
         cell.priceLabel.text = "$\(price!)"
