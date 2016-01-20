@@ -9,15 +9,15 @@
 import UIKit
 import Parse
 
-class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurchaseQueueDelegate {
+class FarmCurrentProduceTableViewController: UITableViewController {
 
     struct Constants {
 
         static let cellIdentifier = "produceCell"
         static let UpdateBagButtonHeight = CGFloat(50.0)
     }
-    //should not allow for multiple produce names. Fucks up key/value pair a
-    var produceList = [(PFObject, Int)]()
+    //should not allow for multiple produce names. Fucks up key/value pair
+    var produceList = [PFObject]()
     var BagNeedsUpdating = false
     var UpdateBagButton: UIButton?
     
@@ -29,37 +29,6 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    @IBAction func UpdateBagAction(sender: UIButton) {
-        let navController = self.tabBarController?.viewControllers![2] as! UINavigationController
-        let groceryVC = navController.topViewController as! GroceryBagTableViewController
-        var iterator = 0
-        for (produce, num) in produceList {
-            if num > 0 {
-                let userProduceInstance = PFObject(className: "userQueuedProduce")
-                userProduceInstance.objectId = produce.objectId
-                userProduceInstance[ParseKeys.ProduceNameKey] = produce[ParseKeys.ProduceNameKey]
-                userProduceInstance[ParseKeys.ProduceNumKey] = num
-                userProduceInstance[ParseKeys.ProduceFarmKey] = produce[ParseKeys.ProduceFarmKey]
-                userProduceInstance[ParseKeys.ProducePurchasedStatusKey] = false
-                groceryVC.produceList.append(userProduceInstance)
-                produceList[iterator].1 = 0
-            }
-            iterator++
-        }
-        self.tableView.reloadData()
-        groceryVC.tableView.reloadData()
-        BagNeedsUpdating = false
-        UIView.animateWithDuration(2.0, delay: 0.0, usingSpringWithDamping: 0.3, initialSpringVelocity: 2.0, options: UIViewAnimationOptions.CurveLinear, animations: {
-            self.UpdateBagButton?.center = CGPoint(x: CGFloat(self.view.bounds.maxX - 50), y: CGFloat(self.view.bounds.maxY - 50))
-            self.UpdateBagButton?.frame = CGRectMake(self.view.bounds.maxX - 50, self.view.bounds.maxY - 50, 10, 1)
-            self.view.layoutIfNeeded()
-            }, completion: { (value: Bool) in
-                self.UpdateBagButton?.removeFromSuperview()
-                self.UpdateBagButton = nil
-        })
-        
     }
     
     func showUpdateBagButton() {
@@ -81,14 +50,6 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
             self.view.layoutIfNeeded()
             }, completion: nil)
     }
-    
-    func updatePurchaseCount(index: Int, newValue: Int) {
-        produceList[index].1 = newValue
-        if !BagNeedsUpdating {
-            BagNeedsUpdating = true
-            showUpdateBagButton()
-        }
-    }
 
     // MARK: - Table view data source
 
@@ -104,11 +65,10 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath) as? ProduceTableViewCell
-        cell?.ProduceName.text = produceList[indexPath.row].0[ParseKeys.ProduceNameKey] as? String
-        let price = produceList[indexPath.row].0[ParseKeys.ProducePriceKey] as! Float
+        cell?.ProduceName.text = produceList[indexPath.row][ParseKeys.ProduceNameKey] as? String
+        let price = produceList[indexPath.row][ParseKeys.ProducePriceKey] as! Float
         cell?.Price.text = "$\(price)"
         cell?.rowNum = indexPath.row
-        cell?.delegate = self
         
         return cell!
     }
@@ -141,9 +101,11 @@ class FarmCurrentProduceTableViewController: UITableViewController, ChangingPurc
         // Pass the selected object to the new view controller.
         if let destVC = segue.destinationViewController as? IndividualProduceViewController {
             let row = sender as! Int
-            let (produce, num) = produceList[row]
-                destVC.produceObject = produce
-                destVC.quantity = num
+            let produce = produceList[row]
+            destVC.produceObject = produce
+            let quantity = produce[ParseKeys.ProduceUnitsKey] as? Int
+            print(quantity)
+            destVC.quantity = quantity
             
         }
     }

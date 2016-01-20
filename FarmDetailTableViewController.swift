@@ -156,7 +156,7 @@ class FarmDetailTableViewController: UITableViewController {
                 if error == nil {
                     if let objects = objects {
                         for object in objects {
-                            produceVC.produceList.append((object, 0))
+                            produceVC.produceList.append(object)
                         }
                         
                         produceVC.tableView.reloadData()

@@ -8,22 +8,11 @@
 
 import UIKit
 
-protocol ChangingPurchaseQueueDelegate {
-    func updatePurchaseCount(index: Int, newValue: Int)
-}
-
 class ProduceTableViewCell: UITableViewCell {
-
-    @IBAction func ChangeTotal(sender: UIStepper) {
-        delegate!.updatePurchaseCount(rowNum!, newValue: Int(sender.value))
-
-    }
     
     var rowNum: Int?
     @IBOutlet weak var ProduceName: UILabel!
     @IBOutlet weak var Price: UILabel!
-    
-    var delegate: ChangingPurchaseQueueDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()

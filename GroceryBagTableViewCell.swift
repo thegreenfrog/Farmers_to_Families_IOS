@@ -10,6 +10,7 @@ import UIKit
 
 class GroceryBagTableViewCell: UITableViewCell {
 
+    @IBOutlet weak var priceLabel: UILabel!
     @IBOutlet weak var produceCountLabel: UILabel!
     @IBOutlet weak var farmNameLabel: UILabel!
     @IBOutlet weak var produceNameLabel: UILabel!

@@ -20,6 +20,8 @@ class GroceryBagTableViewController: UITableViewController {
     
     var produceList = [PFObject]()
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.tableFooterView = UIView()
@@ -59,27 +61,7 @@ class GroceryBagTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    override func setEditing(editing: Bool, animated: Bool) {
-        super.setEditing(editing, animated: animated)
-        self.tableView.setEditing(editing, animated: animated)
-    }
-    
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == UITableViewCellEditingStyle.Delete {
-            produceList.removeAtIndex(indexPath.row)
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
-            if produceList.count == 0 {
-                animateButtonDisappear()
-            }
-        }
-    }
-    
-    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-        if self.tableView.editing {
-            return UITableViewCellEditingStyle.Delete
-        }
-        return UITableViewCellEditingStyle.None
-    }
+    // MARK: - Checkout functions
     
     func animateButtonDisappear() {
         UIView.animateWithDuration(1.0, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
@@ -105,32 +87,108 @@ class GroceryBagTableViewController: UITableViewController {
 
     }
     
+    //note: should ultimately be done on Cloud code when scaling so user doesn't
+    //have to cache a huge amount of order info. Also security/privacy is a related issue
+    func replaceOtherBid(produceID: String) -> Bool {
+        var hasError = false
+        //If so, find specific produce order to replace
+        let query = PFQuery(className: ParseKeys.UserOrderProduceClassName)
+        query.whereKey(ParseKeys.ProduceSourceObjectID, equalTo: produceID)
+        query.orderByAscending(ParseKeys.ProducePriceKey)
+        query.addDescendingOrder(ParseKeys.createdAtKey)
+        query.getFirstObjectInBackgroundWithBlock{ (object, error) in
+            if error != nil || object == nil {
+                hasError = true
+                return
+            }
+            let orderId = object![ParseKeys.UserOrderId] as! String
+            //get order
+            let orderQuery = PFQuery(className: ParseKeys.UserOrderClassName)
+            orderQuery.whereKey(ParseKeys.UserOrderId, equalTo: orderId)
+            orderQuery.getFirstObjectInBackgroundWithBlock{ (orderObject, error) in
+                if error != nil || orderObject == nil {
+                    hasError = true
+                    return
+                }
+                let relation = orderObject?.relationForKey(ParseKeys.UserOrderRelationKey)
+                relation?.removeObject(object!)
+                print("removed \(object![ParseKeys.ProduceNameKey] as! String) from order #\(orderObject![ParseKeys.UserOrderId] as! String)")
+                object!.deleteInBackground()
+                //notify order's user of removal
+                
+            }
+        }
+        return !hasError
+        //replace it and notify user account.
+        
+    }
+    
+    //as seen here: http://stackoverflow.com/questions/26845307/generate-random-alphanumeric-string-in-swift
+    func randomStringWithLength (len: Int) -> NSString {
+        let letters : NSString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        let randomString : NSMutableString = NSMutableString(capacity: len)
+        
+        for (var i=0; i < len; i++){
+            let length = UInt32 (letters.length)
+            let rand = arc4random_uniform(length)
+            randomString.appendFormat("%C", letters.characterAtIndex(Int(rand)))
+        }
+        
+        return randomString
+    }
+    
+    func savePurchaseHistory(produce: PFObject, inout orderObject: PFObject, orderID: NSString, inout orderRelation: PFRelation, inout totalProduce: Int) -> PFObject {
+        let purchasedProduce = PFObject.init(className: ParseKeys.UserOrderProduceClassName)
+        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceNameKey), forKey: ParseKeys.ProduceNameKey)
+        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceSourceObjectID), forKey: ParseKeys.ProduceSourceObjectID)
+        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProducePriceKey), forKey: ParseKeys.ProducePriceKey)
+        purchasedProduce.setValue(orderID, forKey: ParseKeys.UserOrderId)
+        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceFarmKey), forKey: ParseKeys.ProduceFarmKey)
+        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceUnitsKey), forKey: ParseKeys.ProduceUnitsKey)
+        purchasedProduce.setValue(PFUser.currentUser()!.username!, forKey: ParseKeys.UserOrderUser)
+        return purchasedProduce
+    }
+    
     func ExecuteCheckout() {
-        let orderObject = PFObject.init(className: ParseKeys.UserOrderClassName)
+        var orderObject = PFObject.init(className: ParseKeys.UserOrderClassName)
+        let orderID = randomStringWithLength(7)
+        orderObject.setObject(orderID, forKey: ParseKeys.UserOrderId)
         orderObject.setObject(PFUser.currentUser()!.username!, forKey: ParseKeys.UserOrderUser)
-        let orderRelation = orderObject.relationForKey(ParseKeys.UserOrderRelationKey)
+        var orderRelation = orderObject.relationForKey(ParseKeys.UserOrderRelationKey)
         var totalProduce = self.produceList.count
         for produce in self.produceList {
+            //check if outbid product. 
+            let didBid = produce[ParseKeys.ProduceBidKey] as! Bool
+            if didBid {
+                replaceOtherBid(produce[ParseKeys.ProduceSourceObjectID] as! String)
+                let purchasedProduce = savePurchaseHistory(produce, orderObject: &orderObject, orderID: orderID, orderRelation: &orderRelation, totalProduce: &totalProduce)
+                purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
+                    if success {
+                        orderRelation.addObject(purchasedProduce)
+                    }
+                    totalProduce--
+                    if totalProduce == 0 {
+                        orderObject.saveInBackground()
+                    }
+                }
+                continue
+            }
+            
             //retrieve updated produce information
-            let produceQuantity = produce[ParseKeys.ProduceNumKey] as! Int
+            let produceQuantity = produce[ParseKeys.ProduceUnitsKey] as! Int
             let objectQuery = PFQuery(className: ParseKeys.CurrentProduceClassName)
-            objectQuery.whereKey(ParseKeys.PFObjectObjectID, equalTo: produce.objectId!)
+            objectQuery.whereKey(ParseKeys.PFObjectObjectID, equalTo: produce.valueForKey(ParseKeys.ProduceSourceObjectID)! as! String)
             objectQuery.getFirstObjectInBackgroundWithBlock{ (object, error) in
                 //check to make sure object still exists, enough inventory to make purchase
                 if error != nil || object == nil || (object?.valueForKey(ParseKeys.ProduceUnitsKey) as! Int) < produceQuantity{
                     //notify user purchase could not be done
                     self.showCheckoutError(produce[ParseKeys.ProduceNameKey] as! String)
+                    return
                 }
                 object!.incrementKey(ParseKeys.ProduceUnitsKey, byAmount: -produceQuantity)
-                object!.setObject(true, forKey: ParseKeys.ProducePurchasedStatusKey)
                 object!.saveInBackground()
-                produce[ParseKeys.ProducePurchasedStatusKey] = true
                 //create purchase history
-                let purchasedProduce = PFObject.init(className: ParseKeys.UserOrderProduceClassName)
-                purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceNameKey), forKey: ParseKeys.ProduceNameKey)
-                purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceFarmKey), forKey: ParseKeys.ProduceFarmKey)
-                purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceNumKey), forKey: ParseKeys.ProduceNumKey)
-                purchasedProduce.setValue(PFUser.currentUser()!.username!, forKey: ParseKeys.UserOrderUser)
+                let purchasedProduce = self.savePurchaseHistory(produce, orderObject: &orderObject, orderID: orderID, orderRelation: &orderRelation, totalProduce: &totalProduce)
                 purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
                     if success {
                         orderRelation.addObject(purchasedProduce)
@@ -186,13 +244,36 @@ class GroceryBagTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath) as! GroceryBagTableViewCell
         let produce = produceList[indexPath.row]
         cell.produceNameLabel.text = produce[ParseKeys.ProduceNameKey] as? String
-        let produceNum = produce[ParseKeys.ProduceNumKey] as? Int
+        let produceNum = produce[ParseKeys.ProduceUnitsKey] as? Int
         cell.produceCountLabel.text = "\(produceNum!)"
+        let price = produce[ParseKeys.ProducePriceKey] as? Float
+        cell.priceLabel.text = "$\(price!)"
         cell.farmNameLabel.text = produce[ParseKeys.ProduceFarmKey] as? String
         
         return cell
     }
     
+    override func setEditing(editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        self.tableView.setEditing(editing, animated: animated)
+    }
+    
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.Delete {
+            produceList.removeAtIndex(indexPath.row)
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
+            if produceList.count == 0 {
+                animateButtonDisappear()
+            }
+        }
+    }
+    
+    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+        if self.tableView.editing {
+            return UITableViewCellEditingStyle.Delete
+        }
+        return UITableViewCellEditingStyle.None
+    }
 
     /*
     // Override to support conditional editing of the table view.
