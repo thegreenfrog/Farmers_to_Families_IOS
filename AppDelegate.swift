@@ -15,6 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
+    func getMajorSystemVersion() -> Int {
+        return Int(String(Array(arrayLiteral: UIDevice.currentDevice().systemVersion)[0]))!
+    }
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
@@ -29,8 +32,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // [Optional] Track statistics around application opens.
         PFAnalytics.trackAppOpenedWithLaunchOptions(launchOptions)
+
+//        UIApplication.sharedApplication().registerForRemoteNotifications()
         
         return true
+    }
+    
+    func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+        print("Got token data! \(deviceToken)")
+        let trimEnds = {
+            deviceToken.description.stringByTrimmingCharactersInSet(
+                NSCharacterSet(charactersInString: "<>"))
+        }
+        let cleanToken = {
+            trimEnds().stringByReplacingOccurrencesOfString(" ", withString: "")
+        }
+        let user = PFUser.currentUser()
+        user?.setObject(cleanToken(), forKey: "mobileToken")
+        user?.saveInBackground()
+    }
+    
+    func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
+        print("Couldn't register: \(error)")
     }
 
     func applicationWillResignActive(application: UIApplication) {

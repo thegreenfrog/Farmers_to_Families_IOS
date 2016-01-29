@@ -34,6 +34,10 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
         
         farms = [LocalFarm(title: "Rocky Ridge Farm", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 44.028944, longitude: -69.946586), url: NSURL(string: "http://rockyridgeorchard.com/")), LocalFarm(title: "Milkweed Farms", locationName: "Brunswick", coordinate: CLLocationCoordinate2D(latitude: 43.883284, longitude: -69.997941), url: NSURL(string: "https://milkweedfarm.wordpress.com/")), LocalFarm(title: "Mitchell and Savage Maple Products", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 43.905914, longitude: -69.963668), url: NSURL(string: "http://www.mainemaplekitchen.net/")), LocalFarm(title: "Tall Pines Farm", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 44.027677, longitude: -70.023428), url: nil), LocalFarm(title: "Whatley Farm", locationName: "Topsham", coordinate: CLLocationCoordinate2D(latitude: 43.927544, longitude: -69.975946), url: nil)]
         filteredFarmSearch = farms
+        
+        self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
+
         self.tableView.reloadData()
 
         // Uncomment the following line to preserve selection between presentations
@@ -75,6 +79,7 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
         cell.textLabel!.text = thisFarm.title
         cell.detailTextLabel?.text = thisFarm.locationName
         cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
+        cell.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
         
         return cell
     }

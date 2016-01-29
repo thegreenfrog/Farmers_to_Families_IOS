@@ -17,6 +17,7 @@ class GroceryBagTableViewController: UITableViewController {
     }
     
     var CheckoutButton: UIButton?
+    var noProduceLabel: UILabel?
     
     var produceList = [PFObject]()
     
@@ -30,13 +31,29 @@ class GroceryBagTableViewController: UITableViewController {
         
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
          self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        self.navigationItem.rightBarButtonItem?.tintColor = UIColor.blackColor()
+        self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
         
     }
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         
+        if produceList.count == 0 {
+            let frame = CGRectMake(0, self.view.bounds.midY, self.view.bounds.width, 40)
+            noProduceLabel = UILabel(frame: frame)
+            noProduceLabel!.text = "No Produce in Bag"
+            noProduceLabel!.textAlignment = .Center
+            noProduceLabel!.textColor = UIColor.darkGrayColor()
+            self.view.addSubview(noProduceLabel!)
+        }
+        
         if(produceList.count > 0 && CheckoutButton == nil) {
+            if noProduceLabel != nil {
+                noProduceLabel?.removeFromSuperview()
+                noProduceLabel = nil
+            }
             CheckoutButton = UIButton()
             CheckoutButton?.setTitle("Checkout", forState: .Normal)
             CheckoutButton?.frame = CGRectMake(0, self.view.bounds.maxY - (self.tabBarController?.tabBar.bounds.height)!, self.view.bounds.width, Constants.CheckoutButtonHeight)
@@ -117,6 +134,16 @@ class GroceryBagTableViewController: UITableViewController {
                 }
                 let relation = orderObject?.relationForKey(ParseKeys.UserOrderRelationKey)
                 relation?.removeObject(object!)
+                
+                //notify oubtid user
+                let user = orderObject?.valueForKey(ParseKeys.UserOrderUser)
+                let notification = PFObject(className: ParseKeys.NotificationClassName)
+                notification.setValue(user, forKey: ParseKeys.NotificationUser)
+                notification.setValue(orderObject?.valueForKey(ParseKeys.UserOrderId), forKey: ParseKeys.NotificationOrderId)
+                notification.setValue(object?.valueForKey(ParseKeys.ProduceSourceObjectID), forKey: ParseKeys.NotificationProduceId)
+                notification.setValue(object?.valueForKey(ParseKeys.ProduceNameKey), forKey: ParseKeys.NotificationProduceName)
+                notification.saveInBackground()
+                
                 print("removed \(object![ParseKeys.ProduceNameKey] as! String) from order #\(orderObject![ParseKeys.UserOrderId] as! String)")
                 object!.deleteInBackground()
                 //notify order's user of removal
@@ -208,6 +235,12 @@ class GroceryBagTableViewController: UITableViewController {
         }
         produceList = []
         self.tableView.reloadData()
+//        let settings = UIApplication.sharedApplication().currentUserNotificationSettings()
+//        if settings?.types == UIUserNotificationType.None {
+//            let alertSetting = UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil)
+//            UIApplication.sharedApplication().registerUserNotificationSettings(alertSetting)
+//        }
+        
     }
     
     func CheckoutAction(sender: UIButton) {

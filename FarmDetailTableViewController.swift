@@ -27,6 +27,7 @@ class FarmDetailTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -59,6 +60,7 @@ class FarmDetailTableViewController: UITableViewController {
             cell.textLabel?.textColor = UIColor.lightGrayColor()
             cell.selectionStyle = UITableViewCellSelectionStyle.None
         }
+        cell.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
         // Configure the cell...
 
         return cell
@@ -122,11 +124,10 @@ class FarmDetailTableViewController: UITableViewController {
     // MARK: - Navigation
     
     func showPictures(segue: UIStoryboardSegue) {
-        let destination = segue.destinationViewController as? UINavigationController
-        if let photoCollectionVC = destination?.topViewController as? FarmPhotoCollectionViewController {
+        if let photoCollectionVC = segue.destinationViewController as? FarmPhotoCollectionViewController {
             photoCollectionVC.farmName = farmDetails
             let query = PFQuery(className: ParseKeys.FarmPhotoClassName)
-            query.whereKey(ParseKeys.FarmPhotoFarmKey, equalTo: (farmDetails?.title)!)
+            query.whereKey(ParseKeys.FarmPhotoFarmKey, equalTo: (self.farmDetails?.title)!)
             query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
                 if error != nil ||  objects == nil{
                     return

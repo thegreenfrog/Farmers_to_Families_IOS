@@ -30,5 +30,15 @@ struct ParseKeys {
     static let UserOrderRelationKey = "purchased"
     static let UserOrderProduceClassName = "producePurchased"
     
+    static let NotificationClassName = "notifications"
+    static let NotificationDetails = "details"
+    static let NotificationTitle = "title"
+    static let NotificationProduceId = "produceId"
+    static let NotificationProduceName = "produceName"
+    static let NotificationOrderId = "orderId"
+    static let NotificationUser = "user"
+    static let NotificationTitleOutBid = "You have been outbid"
+    
     static let PFObjectObjectID = "objectId"
 }
+

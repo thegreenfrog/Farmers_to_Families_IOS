@@ -13,8 +13,27 @@ class ProfileTableViewController: UITableViewController {
 
     // MARK: - Variables and Constants
     
-    let TabLabels = [["Starred", "Order History"],["Edit Information"]]
-    let segueIdentifiers = [["seeStarred", "seeOrders"], ["changeUserInfo"]]//"changeLocation", "seeOrders"
+    struct Constants {
+        static let signInUpHeight: CGFloat = 25
+        static let signInUpWidth: CGFloat = 80
+        static let signInTitle = "Sign In"
+        static let signUpTitle = "Sign Up"
+        static let cornerRadius: CGFloat = 2.5
+        static let signInVerticalSpacingFromCenter:CGFloat = 20
+        
+        static let cellIdentifier = "profileCell"
+        static let signUpSegueID = "signUpPage"
+        static let signInSegueID = "signInModal"
+        static let notSignedInTitle = "Your Profile"
+        static let signIn = "Sign In"
+        static let logOut = "Log Out"
+    }
+    
+    let TabLabels = [["Starred", "Order History", "Notifications"],["Edit Information"]]
+    let segueIdentifiers = [["seeStarred", "seeOrders", "seeNotifications"], ["changeUserInfo"]]//"changeLocation", "seeOrders"
+
+    @IBOutlet weak var signInLogOutButton: UIBarButtonItem!
+
     
     @IBAction func signInLogOutAction(sender: UIBarButtonItem) {
         if sender.title == Constants.signIn {
@@ -40,22 +59,6 @@ class ProfileTableViewController: UITableViewController {
             presentViewController(alert, animated: true, completion: nil)
         }
     }
-    @IBOutlet weak var signInLogOutButton: UIBarButtonItem!
-    struct Constants {
-        static let signInUpHeight: CGFloat = 25
-        static let signInUpWidth: CGFloat = 80
-        static let signInTitle = "Sign In"
-        static let signUpTitle = "Sign Up"
-        static let cornerRadius: CGFloat = 2.5
-        static let signInVerticalSpacingFromCenter:CGFloat = 20
-        
-        static let cellIdentifier = "profileCell"
-        static let signUpSegueID = "signUpPage"
-        static let signInSegueID = "signInModal"
-        static let notSignedInTitle = "Your Profile"
-        static let signIn = "Sign In"
-        static let logOut = "Log Out"
-    }
     
     
     // MARK: - Life Cycle
@@ -64,10 +67,14 @@ class ProfileTableViewController: UITableViewController {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
+        self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
     }
     
     override func viewWillAppear(animated: Bool) {
         self.tableView.reloadData()
+        signInLogOutButton.tintColor = UIColor.blackColor()
+
     }
     
 //    func checkSignInStatus() {
@@ -126,8 +133,8 @@ class ProfileTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath)
         cell.textLabel?.text = TabLabels[indexPath.section][indexPath.row]
         cell.accessoryType = .DisclosureIndicator
-        // Configure the cell...
-
+        cell.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
+        //cell.layer.borderColor = UIColor(red: 160/255, green: 82/255, blue: 45/255, alpha: 1.0).CGColor
         return cell
     }
     
@@ -198,7 +205,7 @@ class ProfileTableViewController: UITableViewController {
         // Pass the selected object to the new view controller.
         if segue.identifier == "seeOrders" {
             let ordersVC = segue.destinationViewController as! OrderHistoryTableViewController
-            let query = PFQuery(className: "userOrder")
+            let query = PFQuery(className: ParseKeys.UserOrderClassName)
             let currentUser = PFUser.currentUser()!.username!
             query.whereKey("user", equalTo: currentUser)
             //print(currentUser)
@@ -210,6 +217,22 @@ class ProfileTableViewController: UITableViewController {
                         }
                         
                     }
+                }
+            })
+        } else if segue.identifier == "seeNotifications" {
+            let notificationVC = segue.destinationViewController as! NotificationsTableViewController
+            let query = PFQuery(className: ParseKeys.NotificationClassName)
+            let currentUser = PFUser.currentUser()!.username!
+            query.whereKey(ParseKeys.NotificationUser, equalTo: currentUser)
+            query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
+                if error != nil {
+                    return
+                }
+                if let objects = objects {
+                    for object in objects {
+                        notificationVC.notificationList.append(object)
+                    }
+                    notificationVC.tableView.reloadData()
                 }
             })
         }

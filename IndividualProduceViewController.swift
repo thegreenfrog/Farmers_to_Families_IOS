@@ -53,7 +53,8 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         let userProduceInstance = PFObject(className: "userQueuedProduce")
         userProduceInstance[ParseKeys.ProduceNameKey] = self.produceObject![ParseKeys.ProduceNameKey]
         if self.quantity == 0 {
-            userProduceInstance[ParseKeys.ProducePriceKey] = NSNumberFormatter().numberFromString((self.setPriceTextField?.text)!)!.floatValue
+            let price = self.setPriceTextField?.text
+            userProduceInstance[ParseKeys.ProducePriceKey] = NSNumberFormatter().numberFromString(price!)!.doubleValue
             userProduceInstance[ParseKeys.ProduceBidKey] = true
             self.setPriceTextField?.text = Constants.textFieldFiller
             self.setPriceTextField?.textColor = UIColor.lightGrayColor()
