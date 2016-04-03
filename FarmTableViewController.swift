@@ -9,34 +9,29 @@
 import UIKit
 import Parse
 
-class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISearchControllerDelegate {
+class FarmTableViewController: UITableViewController, UISearchResultsUpdating {
 
     var farms = [LocalFarm]()
     var filteredFarmSearch = [LocalFarm]()
-    
-    @IBAction func switchToMap(sender: UIBarButtonItem) {
-        if sender.title == "MapView" {
-            self.mapContainerView.hidden = false
-            sender.title = "ListView"
-        } else {
-            self.mapContainerView.hidden = true
-            sender.title = "MapView"
-        }
-    }
-    
-    @IBOutlet weak var switchLabel: UIBarButtonItem!
-    @IBOutlet weak var mapContainerView: UIView!
+
+    let searchController = UISearchController(searchResultsController: nil)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.mapContainerView.hidden = true
-        
         farms = [LocalFarm(title: "Rocky Ridge Farm", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 44.028944, longitude: -69.946586), url: NSURL(string: "http://rockyridgeorchard.com/")), LocalFarm(title: "Milkweed Farms", locationName: "Brunswick", coordinate: CLLocationCoordinate2D(latitude: 43.883284, longitude: -69.997941), url: NSURL(string: "https://milkweedfarm.wordpress.com/")), LocalFarm(title: "Mitchell and Savage Maple Products", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 43.905914, longitude: -69.963668), url: NSURL(string: "http://www.mainemaplekitchen.net/")), LocalFarm(title: "Tall Pines Farm", locationName: "Bowdoin", coordinate: CLLocationCoordinate2D(latitude: 44.027677, longitude: -70.023428), url: nil), LocalFarm(title: "Whatley Farm", locationName: "Topsham", coordinate: CLLocationCoordinate2D(latitude: 43.927544, longitude: -69.975946), url: nil)]
         filteredFarmSearch = farms
         
+        self.tableView.registerClass(FarmCell.self, forCellReuseIdentifier: NSStringFromClass(FarmCell))
         self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
+        
+        searchController.searchResultsUpdater = self
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.sizeToFit()
+        definesPresentationContext = true
+        self.tableView.tableHeaderView = searchController.searchBar
 
         self.tableView.reloadData()
 
@@ -51,6 +46,14 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+        super.init(nibName: "FarmTableViewController", bundle: nibBundleOrNil)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - Table view data source
 
@@ -61,7 +64,7 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        if tableView == self.searchDisplayController!.searchResultsTableView {
+        if searchController.active && searchController.searchBar.text != "" {
             return self.filteredFarmSearch.count
         } else {
             return self.farms.count
@@ -69,23 +72,26 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = self.tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
+        var cell = self.tableView.dequeueReusableCellWithIdentifier(NSStringFromClass(FarmCell), forIndexPath: indexPath) as? FarmCell
+        if(cell == nil) {
+            cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: NSStringFromClass(FarmCell)) as? FarmCell
+        }
         var thisFarm: LocalFarm
-        if tableView == self.searchDisplayController!.searchResultsTableView {
+        if searchController.active && searchController.searchBar.text != "" {
             thisFarm = self.filteredFarmSearch[indexPath.row]
         } else {
             thisFarm = self.farms[indexPath.row]
         }
-        cell.textLabel!.text = thisFarm.title
-        cell.detailTextLabel?.text = thisFarm.locationName
-        cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-        cell.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
+        cell?.nameLabel.text = thisFarm.title
         
-        return cell
+        return cell!
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        performSegueWithIdentifier("showFarmDetail", sender: self)
+        let farm = filteredFarmSearch[indexPath.row]
+        let farmDetVC = FarmDetailTableViewController()
+        farmDetVC.farmDetails = farm
+        navigationController?.pushViewController(farmDetVC, animated: true)
     }
 
 
@@ -123,6 +129,11 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
         return true
     }
     */
+    
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
+        filterContentForSearchText(searchController.searchBar.text!)
+        tableView.reloadData()
+    }
 
     func filterContentForSearchText(searchText: String) {
         // Filter the array using the filter method
@@ -131,15 +142,6 @@ class FarmTableViewController: UITableViewController, UISearchBarDelegate, UISea
             let locationMatch = farm.locationName.rangeOfString(searchText)
             return (titleMatch != nil) || (locationMatch != nil)
         })
-    }
-    
-    func searchDisplayController(controller: UISearchController, shouldReloadTableForSearchString searchString: String!) -> Bool {
-        self.filterContentForSearchText(searchString)
-        return true
-    }
-    
-    @IBAction func unwindToFarmSearch(segue: UIStoryboardSegue) {
-        
     }
     
     

@@ -34,6 +34,7 @@ class GroceryBagTableViewController: UITableViewController {
         self.navigationItem.rightBarButtonItem?.tintColor = UIColor.blackColor()
         self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
+        self.tableView.registerClass(GroceryBagTableViewCell.self, forCellReuseIdentifier: NSStringFromClass(GroceryBagTableViewCell))
         
     }
     
@@ -75,6 +76,14 @@ class GroceryBagTableViewController: UITableViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+        super.init(nibName: "GroceryBagTableViewController", bundle: nibBundleOrNil)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Checkout functions

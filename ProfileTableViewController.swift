@@ -69,12 +69,21 @@ class ProfileTableViewController: UITableViewController {
         // Do any additional setup after loading the view.
         self.tableView.backgroundColor = Colors.lightGray
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
+        self.tableView.registerClass(ProduceTableViewCell.self, forCellReuseIdentifier: NSStringFromClass(ProduceTableViewCell))
     }
     
     override func viewWillAppear(animated: Bool) {
         self.tableView.reloadData()
-        signInLogOutButton.tintColor = UIColor.blackColor()
+        //signInLogOutButton.tintColor = UIColor.blackColor()
 
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+        super.init(nibName: "ProfileTableViewController", bundle: nibBundleOrNil)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
 //    func checkSignInStatus() {
@@ -111,21 +120,21 @@ class ProfileTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        if PFUser.currentUser() == nil {
-            self.title = Constants.notSignedInTitle
-            signInLogOutButton.title = Constants.signIn
-            signIn()
-            return 0
-        } else {
-            if let first = PFUser.currentUser()!["firstName"] as? String, last = PFUser.currentUser()!["lastName"] as? String {
-                self.title = first + " " + last
-            } else {
-                self.title = "No Name"
-            }
-            signInLogOutButton.title = Constants.logOut
-            return TabLabels[section].count
-        }
-        
+//        if PFUser.currentUser() == nil {
+//            self.title = Constants.notSignedInTitle
+//            signInLogOutButton.title = Constants.signIn
+//            signIn()
+//            return 0
+//        } else {
+//            if let first = PFUser.currentUser()!["firstName"] as? String, last = PFUser.currentUser()!["lastName"] as? String {
+//                self.title = first + " " + last
+//            } else {
+//                self.title = "No Name"
+//            }
+//            signInLogOutButton.title = Constants.logOut
+//            return TabLabels[section].count
+//        }
+        return 0
     }
     
 

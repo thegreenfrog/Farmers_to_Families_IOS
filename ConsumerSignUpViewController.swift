@@ -118,8 +118,24 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         self.view.addConstraint(signUpCenterXConstraint)
         self.view.addConstraint(signUpCenterYContraint)
         self.view.addConstraint(signUpLeftConstraint)
-        signUpButton.addTarget(self, action: "signUpAction", forControlEvents: .TouchUpInside)
+        signUpButton.addTarget(self, action: "goToApp", forControlEvents: .TouchUpInside)
         
+    }
+    
+    func goToApp() {
+        let tabBarVC = UITabBarController()
+        let farmNavVC = UINavigationController()
+        farmNavVC.tabBarItem = UITabBarItem(title: "Produce", image: UIImage(named: "Broccoli.png"), tag: 0)
+        farmNavVC.pushViewController(FarmTableViewController(nibName: "FarmTableViewController", bundle: nil), animated: false)
+        let profileNavVC = UINavigationController()
+        profileNavVC.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(named: "User.png"), tag: 1)
+        profileNavVC.pushViewController(ProfileTableViewController(nibName: "ProfileTableViewController", bundle: nil), animated: false)
+        let groceryNavVC = UINavigationController()
+        groceryNavVC.tabBarItem = UITabBarItem(title: "Bag", image: UIImage(named: "Shopping-Bag.png"), tag: 2)
+        groceryNavVC.pushViewController(GroceryBagTableViewController(nibName: "GroceryBagTableViewController", bundle: nil), animated: false)
+        let VC = [farmNavVC, profileNavVC, groceryNavVC]
+        tabBarVC.viewControllers = VC
+        self.presentViewController(tabBarVC, animated: true, completion: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -196,10 +212,16 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
                     self.handleErrors()
                 } else {
                     //set up application
-                    let tabBarVC = UITabBarController()
-                    let VC = [FarmTableViewController(), ProfileTableViewController(), GroceryBagTableViewController()]
-                    tabBarVC.viewControllers = VC
-                    self.presentViewController(tabBarVC, animated: true, completion: nil)
+//                    let tabBarVC = UITabBarController()
+//                    let farmNavVC = UINavigationController()
+//                    farmNavVC.pushViewController(FarmTableViewController(), animated: false)
+//                    let profileNavVC = UINavigationController()
+//                    profileNavVC.pushViewController(ProfileTableViewController(), animated: false)
+//                    let groceryNavVC = UINavigationController()
+//                    groceryNavVC.pushViewController(GroceryBagTableViewController(), animated: false)
+//                    let VC = [farmNavVC, profileNavVC, groceryNavVC]
+//                    tabBarVC.viewControllers = VC
+//                    self.presentViewController(tabBarVC, animated: true, completion: nil)
                 }
             })
         }

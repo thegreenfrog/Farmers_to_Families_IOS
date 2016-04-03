@@ -29,6 +29,7 @@ class FarmDetailTableViewController: UITableViewController {
         super.viewDidLoad()
         self.navigationItem.leftBarButtonItem?.tintColor = UIColor.blackColor()
         self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
+        self.tableView.registerClass(FarmDetailTableViewCell.self, forCellReuseIdentifier: NSStringFromClass(FarmDetailTableViewCell))
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -55,16 +56,19 @@ class FarmDetailTableViewController: UITableViewController {
 
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath)
-        cell.textLabel?.text = detailTabs[indexPath.row]
-        if indexPath.row == 2 && farmDetails?.websiteURL == nil {
-            cell.textLabel?.textColor = UIColor.lightGrayColor()
-            cell.selectionStyle = UITableViewCellSelectionStyle.None
+        var cell = tableView.dequeueReusableCellWithIdentifier(NSStringFromClass(FarmDetailTableViewCell), forIndexPath: indexPath) as? FarmDetailTableViewCell
+        if (cell == nil) {
+            cell = UITableViewCell(style: .Value1, reuseIdentifier: NSStringFromClass(FarmDetailTableViewCell)) as? FarmDetailTableViewCell
         }
-        cell.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
+        cell!.textLabel?.text = detailTabs[indexPath.row]
+        if indexPath.row == 2 && farmDetails?.websiteURL == nil {
+            cell!.textLabel?.textColor = UIColor.lightGrayColor()
+            cell!.selectionStyle = UITableViewCellSelectionStyle.None
+        }
+        cell!.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
         // Configure the cell...
 
-        return cell
+        return cell!
     }
     
 
