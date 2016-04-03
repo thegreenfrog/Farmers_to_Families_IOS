@@ -11,6 +11,7 @@ import Parse
 
 class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
 
+    @IBOutlet weak var produceImageView: UIImageView!
     @IBOutlet weak var produceNameLabel: UILabel!
     @IBOutlet weak var priceLabel: UILabel!
     @IBOutlet weak var quantityLabel: UILabel!
@@ -29,24 +30,17 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         let statusScreen = UILabel(frame: frame)
         statusScreen.text = text
         statusScreen.textAlignment = .Center
-        statusScreen.backgroundColor = UIColor(red: 102/255, green: 139/255, blue: 139/255, alpha: 1.0)
+        statusScreen.backgroundColor = Colors.lightBrown//UIColor(red: 102/255, green: 139/255, blue: 139/255, alpha: 1.0)
         statusScreen.alpha = 0.0
         return statusScreen
     }
     
     //Never see transition to "Bag Updated" Screen
     func animateHideUpdateScreen(groceryVC: GroceryBagTableViewController, updatingBagScreen: UILabel) {
-        let bagUpdatedStatusScreen = createUpdateBagStatusScreen("Bag Updated")
-        self.view.addSubview(bagUpdatedStatusScreen)
-        UIView.animateWithDuration(1.0,
-            animations: {bagUpdatedStatusScreen.alpha = 1.0},
-            completion: { finished in
-                updatingBagScreen.removeFromSuperview()
-                UIView.animateWithDuration(2.0, animations: {
-                    updatingBagScreen.alpha = 0.0
-                })
+        updatingBagScreen.text = "Bag Updated"
+        UIView.animateWithDuration(1.0, delay: 1.5, options: UIViewAnimationOptions.TransitionNone, animations: { updatingBagScreen.alpha = 0.0 }, completion: { (finished: Bool) -> Void in
+            updatingBagScreen.removeFromSuperview()
         })
-        bagUpdatedStatusScreen.removeFromSuperview()
     }
     
     func createUnit() -> PFObject {
@@ -150,6 +144,17 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
+    func drawproduceImageView() {
+        produceImageView.image = UIImage(named: "produce_placeholder.jpg")
+        produceImageView.layer.borderColor = Colors.woodColor.CGColor
+        produceImageView.layer.borderWidth = 2.0
+        produceImageView.layer.shadowColor = UIColor.blackColor().CGColor
+        produceImageView.layer.shadowOffset = CGSizeMake(0, 1)
+        produceImageView.layer.shadowOpacity = 1
+        produceImageView.layer.shadowRadius = 2.0
+        produceImageView.clipsToBounds = false
+    }
+    
     override func viewDidLoad() {
         let tap = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         self.view.addGestureRecognizer(tap)
@@ -159,6 +164,10 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         let price = produceObject![ParseKeys.ProducePriceKey] as? Float
         priceLabel.text = "\(price!)"
         self.title = produceObject![ParseKeys.ProduceFarmKey] as? String
+        self.navigationController?.navigationItem.rightBarButtonItem?.tintColor = UIColor.blackColor()
+        self.view.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
+        drawproduceImageView()
+        
         showQuantityStatus()
         
         if quantity == 0 {
@@ -177,8 +186,8 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
                 delay: 0.0,
                 options: .TransitionCurlUp,
                 animations: {
-                    inputPriceLabel.center.y -= self.view.frame.height/2
-                    self.setPriceTextField!.center.y -= self.view.frame.height/2
+                    inputPriceLabel.center.y -= self.view.frame.height*5/12
+                    self.setPriceTextField!.center.y -= self.view.frame.height*5/12
                 },
                 completion: nil)
         }

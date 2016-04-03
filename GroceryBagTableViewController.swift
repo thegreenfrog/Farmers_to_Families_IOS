@@ -287,6 +287,7 @@ class GroceryBagTableViewController: UITableViewController {
         let price = produce[ParseKeys.ProducePriceKey] as? Float
         cell.priceLabel.text = "$\(price!)"
         cell.farmNameLabel.text = produce[ParseKeys.ProduceFarmKey] as? String
+        cell.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
         
         return cell
     }

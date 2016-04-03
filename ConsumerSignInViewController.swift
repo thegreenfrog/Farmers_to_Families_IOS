@@ -9,7 +9,7 @@
 import UIKit
 import Parse
 
-class SignInViewController: UIViewController, UITextFieldDelegate {
+class ConsumerSignInViewController: UIViewController, UITextFieldDelegate {
 
     // MARK: - Outlets and Variables
     
@@ -17,15 +17,18 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         static let NoEmail = "Please enter your username"
         static let NoPassword = "Please enter your password"
         
+        static let textFieldFrame:CGRect = CGRect(origin: CGPointZero, size: CGSize(width: 0, height: 0))
         static let ErrorBorderWidth:CGFloat = 1.0
         static let ErrorMessageProportionHeight:CGFloat = 20.0
         static let ErrorMessageWidth:CGFloat = 200.0
     }
     
-    @IBOutlet weak var emailTextField: UITextField!
-    @IBOutlet weak var passwordTextField: UITextField!
+    var emailTextField: UITextField!
+    var passwordTextField: UITextField!
     
-    @IBOutlet weak var signUpButton: UIButton!
+    var signInButton: UIButton!
+    var signUpButton: UIButton!
+    var exitButton: UIButton!
     
     let placeholders = ["Username (email)", "Password"]
     var errorMessages = [String]()
@@ -35,14 +38,63 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        emailTextField = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 100)))
+        emailTextField.borderStyle = .Line
         emailTextField.tag = 0
+        emailTextField.font = UIFont.systemFontOfSize(30)
+        emailTextField.returnKeyType = UIReturnKeyType.Done
         emailTextField.text = placeholders[emailTextField.tag]
         emailTextField.textColor = UIColor.lightGrayColor()
         emailTextField.delegate = self
+        emailTextField.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(emailTextField)
+        let emailCenterXConstraint = NSLayoutConstraint(item: emailTextField, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
+        let emailLeftConstraint = NSLayoutConstraint(item: emailTextField, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
+        let emailCenterYContraint = NSLayoutConstraint(item: emailTextField, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -100)
+        self.view.addConstraint(emailCenterYContraint)
+        self.view.addConstraint(emailCenterXConstraint)
+        self.view.addConstraint(emailLeftConstraint)
+        
+        passwordTextField = UITextField(frame: CGRectMake(0, 0, self.view.frame.width-10, 75))
+        passwordTextField.borderStyle = .Line
         passwordTextField.tag = 1
+        passwordTextField.font = UIFont.systemFontOfSize(30)
+        passwordTextField.returnKeyType = UIReturnKeyType.Done
         passwordTextField.text = placeholders[passwordTextField.tag]
         passwordTextField.textColor = UIColor.lightGrayColor()
         passwordTextField.delegate = self
+        passwordTextField.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(passwordTextField)
+        let passwordCenterXConstraint = NSLayoutConstraint(item: passwordTextField, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
+        let passwordLeftConstraint = NSLayoutConstraint(item: passwordTextField, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
+        let passwordCenterYContraint = NSLayoutConstraint(item: passwordTextField, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -50)
+        self.view.addConstraint(passwordCenterXConstraint)
+        self.view.addConstraint(passwordCenterYContraint)
+        self.view.addConstraint(passwordLeftConstraint)
+        
+        signInButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 75)))
+        signInButton.setTitle("Sign In", forState: .Normal)
+        signInButton.backgroundColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
+        signInButton.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(signInButton)
+        let signInCenterXConstraint = NSLayoutConstraint(item: signInButton, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
+        let signInLeftConstraint = NSLayoutConstraint(item: signInButton, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
+        let signInCenterYContraint = NSLayoutConstraint(item: signInButton, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 0)
+        self.view.addConstraint(signInCenterXConstraint)
+        self.view.addConstraint(signInCenterYContraint)
+        self.view.addConstraint(signInLeftConstraint)
+        signInButton.addTarget(self, action: "signInAction", forControlEvents: .TouchUpInside)
+        
+        exitButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 75, height: 75)))
+        exitButton.setTitle("X", forState: .Normal)
+        exitButton.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(exitButton)
+        let exitCenterXConstraint = NSLayoutConstraint(item: exitButton, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1, constant: 0)
+        let exitLeftConstraint = NSLayoutConstraint(item: exitButton, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1, constant: 30)
+        self.view.addConstraint(exitCenterXConstraint)
+        self.view.addConstraint(exitLeftConstraint)
+        exitButton.addTarget(self, action: "exitPage", forControlEvents: .TouchUpInside)
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         view.addGestureRecognizer(tap)
@@ -84,11 +136,15 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - User Actions
     
-    @IBAction func signUpButton(sender: UIButton) {
-        performSegueWithIdentifier("signUpModal", sender: self)
+    func exitPage() {
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-    @IBAction func signInButton(sender: UIButton) {
+    func showApplication() {
+        
+    }
+    
+    func signInAction(sender: UIButton) {
         emailTextField.layer.borderWidth = 0.0
         passwordTextField.layer.borderWidth = 0.0
         
@@ -109,7 +165,8 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
             PFUser.logInWithUsernameInBackground(emailTextField.text!, password: passwordTextField.text!) {
                 (user: PFUser?, error: NSError?) -> Void in
                 if user != nil {
-                    self.performSegueWithIdentifier("cancelFromSignIn", sender: self)
+                    //seque to main application
+                    print("signed in")
                 } else {
                     // The login failed
                     if let error = error {
@@ -124,8 +181,8 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     func handleErrors() {
         let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.ErrorMessageWidth, height: Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)))
         let errorSubView = UIView(frame: frame)
-        errorSubView.center.x = signUpButton.center.x
-        errorSubView.center.y = signUpButton.center.y + Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)
+        errorSubView.center.x = signInButton.center.x
+        errorSubView.center.y = signInButton.center.y + Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)
         errorSubView.layer.borderColor = UIColor.redColor().CGColor
         errorSubView.layer.borderWidth = Constants.ErrorBorderWidth
         var count = 0
@@ -140,10 +197,6 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
             count++
         }
         self.view.addSubview(errorSubView)
-    }
-    
-    @IBAction func cancelAction(sender: UIBarButtonItem) {
-        performSegueWithIdentifier("cancelFromSignIn", sender: self)
     }
     /*
     // MARK: - Navigation

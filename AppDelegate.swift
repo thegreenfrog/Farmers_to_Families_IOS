@@ -35,6 +35,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 //        UIApplication.sharedApplication().registerForRemoteNotifications()
         
+        self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
+        let registerVC = RegisterViewController()
+        self.window?.rootViewController = registerVC
+        
         return true
     }
     

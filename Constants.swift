@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct ParseKeys {
     static let createdAtKey = "createdAt"
@@ -40,5 +41,12 @@ struct ParseKeys {
     static let NotificationTitleOutBid = "You have been outbid"
     
     static let PFObjectObjectID = "objectId"
+}
+
+struct Colors {
+    static let lightGray = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
+    static let lightBrown = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
+    static let woodColor = UIColor(red: 205/255, green: 133/255, blue: 63/255, alpha: 1.0)
+    
 }
 

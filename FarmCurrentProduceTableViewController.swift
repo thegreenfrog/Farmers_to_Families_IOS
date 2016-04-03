@@ -23,7 +23,9 @@ class FarmCurrentProduceTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.blackColor()
         self.tableView.tableFooterView = UIView()
+        self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
     }
 
     override func didReceiveMemoryWarning() {
@@ -69,6 +71,7 @@ class FarmCurrentProduceTableViewController: UITableViewController {
         let price = produceList[indexPath.row][ParseKeys.ProducePriceKey] as! Float
         cell?.Price.text = "$\(price)"
         cell?.rowNum = indexPath.row
+        cell?.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
         
         return cell!
     }

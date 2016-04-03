@@ -67,7 +67,7 @@ class ProfileTableViewController: UITableViewController {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
-        self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
+        self.tableView.backgroundColor = Colors.lightGray
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
     }
     
@@ -133,7 +133,7 @@ class ProfileTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath)
         cell.textLabel?.text = TabLabels[indexPath.section][indexPath.row]
         cell.accessoryType = .DisclosureIndicator
-        cell.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
+        cell.backgroundColor = Colors.lightBrown
         //cell.layer.borderColor = UIColor(red: 160/255, green: 82/255, blue: 45/255, alpha: 1.0).CGColor
         return cell
     }
