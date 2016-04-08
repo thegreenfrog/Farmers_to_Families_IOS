@@ -209,7 +209,7 @@ class GroceryBagTableViewController: UITableViewController {
                     }
                     totalProduce--
                     if totalProduce == 0 {
-                        orderObject.saveInBackground()
+                        orderObject.saveInBackground()//always make sure you save this after you finish with pfRelation
                     }
                 }
                 continue

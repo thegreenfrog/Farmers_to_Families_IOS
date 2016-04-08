@@ -8,18 +8,17 @@
 
 import Foundation
 import MapKit
+import Parse
 
-class LocalFarm: NSObject, MKAnnotation {
+class LocalFarm: NSObject {
     let title: String?
     let locationName: String
-    let coordinate: CLLocationCoordinate2D
-    let websiteURL: NSURL?
+    let produceList: [PFObject]
     
-    init(title: String, locationName: String, coordinate: CLLocationCoordinate2D, url: NSURL?) {
+    init(title: String, locationName: String, produce: [PFObject]) {
         self.title = title
         self.locationName = locationName
-        self.coordinate = coordinate
-        self.websiteURL = url
+        self.produceList = produce
         super.init()
     }
     

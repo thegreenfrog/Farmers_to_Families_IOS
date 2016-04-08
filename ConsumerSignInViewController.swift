@@ -144,10 +144,7 @@ class ConsumerSignInViewController: UIViewController, UITextFieldDelegate {
         
     }
     
-    func signInAction(sender: UIButton) {
-        emailTextField.layer.borderWidth = 0.0
-        passwordTextField.layer.borderWidth = 0.0
-        
+    func checkForErrors() {
         if emailTextField.textColor == UIColor.lightGrayColor() {
             errorMessages.append(Constants.NoEmail)
             emailTextField.layer.borderColor = UIColor.redColor().CGColor
@@ -157,16 +154,28 @@ class ConsumerSignInViewController: UIViewController, UITextFieldDelegate {
             passwordTextField.layer.borderColor = UIColor.redColor().CGColor
             passwordTextField.layer.borderWidth = Constants.ErrorBorderWidth
         }
+    }
+    
+    func signInAction() {
+        checkForErrors()//check for improper inputs
         
-        if(errorMessages.count > 0) {
+        if(errorMessages.count > 0) {//show error messages if improper inputs exist
             handleErrors()
-        } else {
-            print(passwordTextField.text!)
+        } else {//attempt to log in
             PFUser.logInWithUsernameInBackground(emailTextField.text!, password: passwordTextField.text!) {
                 (user: PFUser?, error: NSError?) -> Void in
                 if user != nil {
+                    //save user info
+                    let keyChainWrapper = KeychainWrapper()
+                    keyChainWrapper.mySetObject(self.passwordTextField.text, forKey: kSecValueData)
+                    keyChainWrapper.writeToKeychain()
+                    NSUserDefaults.standardUserDefaults().setBool(true, forKey: "hasLoginKey")
+                    NSUserDefaults.standardUserDefaults().setValue(self.emailTextField.text, forKey: "username")
+                    NSUserDefaults.standardUserDefaults().synchronize()
+                    
                     //seque to main application
-                    print("signed in")
+                    let tabBarVC = ConsumerTabBarController()
+                    self.presentViewController(tabBarVC, animated: true, completion: nil)
                 } else {
                     // The login failed
                     if let error = error {
@@ -179,6 +188,8 @@ class ConsumerSignInViewController: UIViewController, UITextFieldDelegate {
     }
     
     func handleErrors() {
+        emailTextField.layer.borderWidth = 0.0
+        passwordTextField.layer.borderWidth = 0.0
         let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.ErrorMessageWidth, height: Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)))
         let errorSubView = UIView(frame: frame)
         errorSubView.center.x = signInButton.center.x

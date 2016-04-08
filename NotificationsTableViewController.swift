@@ -90,26 +90,4 @@ class NotificationsTableViewController: UITableViewController, goToOutBidProduce
     }
     */
 
-    
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "viewOutBidProduce" {
-            let produceVC = segue.destinationViewController as! IndividualProduceViewController
-            let row = sender as! Int
-            let notification = notificationList[row]
-            let query = PFQuery(className: ParseKeys.CurrentProduceClassName)
-            query.whereKey(ParseKeys.PFObjectObjectID, equalTo: notification.valueForKey(ParseKeys.NotificationUser)!)
-            query.getFirstObjectInBackgroundWithBlock({ (object, error) -> Void in
-                if let object = object {
-                    produceVC.produceObject = object
-                    let quantity = object[ParseKeys.ProduceUnitsKey] as? Int
-                    produceVC.quantity = quantity
-                }
-            })
-            
-        }
-    }
-
 }

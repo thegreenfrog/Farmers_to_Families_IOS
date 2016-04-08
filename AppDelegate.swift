@@ -36,8 +36,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        UIApplication.sharedApplication().registerForRemoteNotifications()
         
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        let registerVC = RegisterViewController()
-        self.window?.rootViewController = registerVC
+        
+        if NSUserDefaults.standardUserDefaults().boolForKey("hasLoginKey") {
+            let tabBarVC = ConsumerTabBarController()
+            self.window?.rootViewController = tabBarVC
+        } else {
+            let registerVC = RegisterViewController()
+            self.window?.rootViewController = registerVC
+        }
+        
+        /*init some hardcoded farms*/
+        //        let rockyClass = PFObject(className: "FarmClass")
+        //        rockyClass.setValue("Rocky Ridge Farm", forKey: "farm")
+        //        rockyClass.setValue("Bowdoin, Maine", forKey: "location")
+        //        let rockyQuery = PFQuery(className: "AvailableProduce")
+        //        rockyQuery.whereKey("farm", equalTo: "Rocky Ridge Farm")
+        //        let rockyProduceRelation = rockyClass.relationForKey("produce")
+        //        rockyQuery.findObjectsInBackgroundWithBlock({ (objects, err) -> Void in
+        //            if let produce = objects {
+        //                for one in produce {
+        //                    rockyProduceRelation.addObject(one)
+        //                }
+        //            }
+        //            rockyClass.saveInBackground()
+        //        })
+        //
+        //        let milkweedClass = PFObject(className: "FarmClass")
+        //        milkweedClass.setValue("Milkweed Farms", forKey: "farm")
+        //        milkweedClass.setValue("Brunswick, Maine", forKey: "location")
+        //        let milkweedQuery = PFQuery(className: "AvailableProduce")
+        //        milkweedQuery.whereKey("farm", equalTo: "Milkweed Farms")
+        //        let milkweedProduceRelation = milkweedClass.relationForKey("produce")
+        //        milkweedQuery.findObjectsInBackgroundWithBlock({ (objects, err) -> Void in
+        //            if let produce = objects {
+        //                for one in produce {
+        //                    milkweedProduceRelation.addObject(one)
+        //                }
+        //            }
+        //            milkweedClass.saveInBackground()
+        //        })
+
         
         return true
     }

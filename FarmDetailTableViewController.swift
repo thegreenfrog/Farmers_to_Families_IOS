@@ -13,17 +13,9 @@ class FarmDetailTableViewController: UITableViewController {
     
     struct Constants {
         static let cellIdentifier = "FarmDetailCell"
-        static let returnSearchSegueIdentifier = "returnToSearch"
-        static let showWebSegueIdentifier = "showWebsite"
-        static let showPictureSegueIdentifier = "showPictures"
-        static let showCurrentProduceSegueIdentifier = "showCurrentProduce"
     }
     
     var farmDetails: LocalFarm?
-    
-    let detailTabs = ["See what is available", "Whats coming up in season", "See more about what they are about", "Pictures!"]
-    
-    let segueNames = ["showCurrentProduce", "showFutureProduce", "showWebsite", "showPictures"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,7 +43,10 @@ class FarmDetailTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return detailTabs.count
+        if farmDetails != nil {
+            return (farmDetails?.produceList.count)!
+        }
+        return 0
     }
 
     
@@ -60,11 +55,7 @@ class FarmDetailTableViewController: UITableViewController {
         if (cell == nil) {
             cell = UITableViewCell(style: .Value1, reuseIdentifier: NSStringFromClass(FarmDetailTableViewCell)) as? FarmDetailTableViewCell
         }
-        cell!.textLabel?.text = detailTabs[indexPath.row]
-        if indexPath.row == 2 && farmDetails?.websiteURL == nil {
-            cell!.textLabel?.textColor = UIColor.lightGrayColor()
-            cell!.selectionStyle = UITableViewCellSelectionStyle.None
-        }
+        cell!.textLabel?.text = farmDetails?.produceList[indexPath.row]["produceName"] as? String
         cell!.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
         // Configure the cell...
 
@@ -75,7 +66,7 @@ class FarmDetailTableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.textColor != UIColor.lightGrayColor() {
-            performSegueWithIdentifier(segueNames[indexPath.row], sender: self)
+            
         }
         
     }
@@ -115,77 +106,10 @@ class FarmDetailTableViewController: UITableViewController {
         return true
     }
     */
-    
-    
-    @IBAction func goBackToSearch(sender: UIBarButtonItem) {
-        performSegueWithIdentifier(Constants.returnSearchSegueIdentifier, sender: sender)
-    }
-    
-    @IBAction func unwindBackToFarmDetail(segue: UIStoryboardSegue) {
-        
-    }
 
 
     // MARK: - Navigation
-    
-    func showPictures(segue: UIStoryboardSegue) {
-        if let photoCollectionVC = segue.destinationViewController as? FarmPhotoCollectionViewController {
-            photoCollectionVC.farmName = farmDetails
-            let query = PFQuery(className: ParseKeys.FarmPhotoClassName)
-            query.whereKey(ParseKeys.FarmPhotoFarmKey, equalTo: (self.farmDetails?.title)!)
-            query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
-                if error != nil ||  objects == nil{
-                    return
-                }
-                for object in objects! {
-                    if let image = object[ParseKeys.FarmPhotoImageKey] as? PFFile {
-                        image.getDataInBackgroundWithBlock({ (imageData: NSData?, error: NSError?) -> Void in
-                            if (error == nil) {
-                                photoCollectionVC.userPhotos.append(UIImage(data: imageData!)!)
-                                photoCollectionVC.collectionView?.reloadData()
-                            }
-                        })
-                    }
-                }
-                
-            })
-        }
-    }
-    
-    func showCurrentProduce(segue: UIStoryboardSegue) {
-        if let produceVC = segue.destinationViewController as? FarmCurrentProduceTableViewController {
-            produceVC.title = farmDetails?.title
-            let query = PFQuery(className: ParseKeys.CurrentProduceClassName)
-            query.whereKey(ParseKeys.ProduceFarmKey, equalTo: (farmDetails?.title)!)
-            query.whereKey(ParseKeys.ProducePurchasedStatusKey, notEqualTo: true)
-            query.findObjectsInBackgroundWithBlock({ (objects: [PFObject]?, error: NSError?) -> Void in
-                if error == nil {
-                    if let objects = objects {
-                        for object in objects {
-                            produceVC.produceList.append(object)
-                        }
-                        
-                        produceVC.tableView.reloadData()
-                    }
-                }
-            })
-        }
-    }
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-        
-        if segue.identifier == Constants.showWebSegueIdentifier {
-            let destination = segue.destinationViewController as? WebsiteViewController
-            destination?.webURL = farmDetails?.websiteURL
-        } else if segue.identifier ==  Constants.showPictureSegueIdentifier{
-            showPictures(segue)
-        } else if segue.identifier == Constants.showCurrentProduceSegueIdentifier {
-            showCurrentProduce(segue)
-        }
-    }
 
 
 }

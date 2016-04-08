@@ -25,12 +25,13 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         static let ErrorMessageWidth:CGFloat = 200.0
     }
     
-    let placeholders = ["First Name", "Last Name", "Username (email)", "Password"]
+    let placeholders = ["First Name", "Last Name", "Username (email)", "Password", "Retype Password"]
     
     var firstNameText: UITextField!
     var lastNameText: UITextField!
     var emailText: UITextField!
     var passText: UITextField!
+    var retypePassText: UITextField!
     
     var signUpButton: UIButton!
     
@@ -51,7 +52,7 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         self.view.addSubview(firstNameText)
         let firstNameCenterXConstraint = NSLayoutConstraint(item: firstNameText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
         let firstNameLeftConstraint = NSLayoutConstraint(item: firstNameText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let firstNameCenterYContraint = NSLayoutConstraint(item: firstNameText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -100)
+        let firstNameCenterYContraint = NSLayoutConstraint(item: firstNameText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -200)
         self.view.addConstraint(firstNameCenterXConstraint)
         self.view.addConstraint(firstNameCenterYContraint)
         self.view.addConstraint(firstNameLeftConstraint)
@@ -68,7 +69,7 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         self.view.addSubview(lastNameText)
         let lastNameCenterXConstraint = NSLayoutConstraint(item: lastNameText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
         let lastNameLeftConstraint = NSLayoutConstraint(item: lastNameText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let lastNameCenterYContraint = NSLayoutConstraint(item: lastNameText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -50)
+        let lastNameCenterYContraint = NSLayoutConstraint(item: lastNameText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -150)
         self.view.addConstraint(lastNameCenterXConstraint)
         self.view.addConstraint(lastNameCenterYContraint)
         self.view.addConstraint(lastNameLeftConstraint)
@@ -85,7 +86,7 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         self.view.addSubview(emailText)
         let emailCenterXConstraint = NSLayoutConstraint(item: emailText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
         let emailLeftConstraint = NSLayoutConstraint(item: emailText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let emailCenterYContraint = NSLayoutConstraint(item: emailText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 0)
+        let emailCenterYContraint = NSLayoutConstraint(item: emailText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -100)
         self.view.addConstraint(emailCenterXConstraint)
         self.view.addConstraint(emailCenterYContraint)
         self.view.addConstraint(emailLeftConstraint)
@@ -102,40 +103,43 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         self.view.addSubview(passText)
         let passCenterXConstraint = NSLayoutConstraint(item: passText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
         let passLeftConstraint = NSLayoutConstraint(item: passText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let passCenterYContraint = NSLayoutConstraint(item: passText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 50)
+        let passCenterYContraint = NSLayoutConstraint(item: passText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -50)
         self.view.addConstraint(passCenterXConstraint)
         self.view.addConstraint(passCenterYContraint)
         self.view.addConstraint(passLeftConstraint)
         
+        retypePassText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 100)))
+        retypePassText.borderStyle = .Line
+        retypePassText.tag = 4
+        retypePassText.font = UIFont.systemFontOfSize(30)
+        retypePassText.returnKeyType = UIReturnKeyType.Done
+        retypePassText.text = placeholders[retypePassText.tag]
+        retypePassText.textColor = UIColor.lightGrayColor()
+        retypePassText.delegate = self
+        retypePassText.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(retypePassText)
+        let retypeCenterXConstraint = NSLayoutConstraint(item: retypePassText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
+        let retypeLeftConstraint = NSLayoutConstraint(item: retypePassText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
+        let retypeCenterYContraint = NSLayoutConstraint(item: retypePassText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 0)
+        self.view.addConstraint(retypeCenterXConstraint)
+        self.view.addConstraint(retypeCenterYContraint)
+        self.view.addConstraint(retypeLeftConstraint)
+        
         signUpButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 75)))
-        signUpButton.setTitle("Sign In", forState: .Normal)
+        signUpButton.setTitle("Sign Up", forState: .Normal)
         signUpButton.backgroundColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
         signUpButton.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(signUpButton)
         let signUpCenterXConstraint = NSLayoutConstraint(item: signUpButton, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
         let signUpLeftConstraint = NSLayoutConstraint(item: signUpButton, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let signUpCenterYContraint = NSLayoutConstraint(item: signUpButton, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 100)
+        let signUpCenterYContraint = NSLayoutConstraint(item: signUpButton, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 50)
         self.view.addConstraint(signUpCenterXConstraint)
         self.view.addConstraint(signUpCenterYContraint)
         self.view.addConstraint(signUpLeftConstraint)
-        signUpButton.addTarget(self, action: "goToApp", forControlEvents: .TouchUpInside)
+        signUpButton.addTarget(self, action: "signUpAction", forControlEvents: .TouchUpInside)
         
-    }
-    
-    func goToApp() {
-        let tabBarVC = UITabBarController()
-        let farmNavVC = UINavigationController()
-        farmNavVC.tabBarItem = UITabBarItem(title: "Produce", image: UIImage(named: "Broccoli.png"), tag: 0)
-        farmNavVC.pushViewController(FarmTableViewController(nibName: "FarmTableViewController", bundle: nil), animated: false)
-        let profileNavVC = UINavigationController()
-        profileNavVC.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(named: "User.png"), tag: 1)
-        profileNavVC.pushViewController(ProfileTableViewController(nibName: "ProfileTableViewController", bundle: nil), animated: false)
-        let groceryNavVC = UINavigationController()
-        groceryNavVC.tabBarItem = UITabBarItem(title: "Bag", image: UIImage(named: "Shopping-Bag.png"), tag: 2)
-        groceryNavVC.pushViewController(GroceryBagTableViewController(nibName: "GroceryBagTableViewController", bundle: nil), animated: false)
-        let VC = [farmNavVC, profileNavVC, groceryNavVC]
-        tabBarVC.viewControllers = VC
-        self.presentViewController(tabBarVC, animated: true, completion: nil)
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        view.addGestureRecognizer(tap)
     }
 
     override func didReceiveMemoryWarning() {
@@ -168,9 +172,8 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         }
         self.view.addSubview(errorSubView)
     }
-
-    func signUpAction() {
-        //make sure inputs are filled in properly
+    
+    func checkForErrors() {
         if firstNameText.textColor == UIColor.lightGrayColor() {
             errorMessages.append(Constants.NoFirstName)
             highlightTextField(firstNameText)
@@ -187,10 +190,15 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
             errorMessages.append(Constants.NoPassword)
             highlightTextField(passText)
         }
-        if passText.textColor == UIColor.lightGrayColor() || passText.text!.characters.count != passText.text!.characters.count {
+        if passText.textColor == UIColor.lightGrayColor() || retypePassText.text!.characters.count != passText.text!.characters.count {
             errorMessages.append(Constants.NoretypePassword)
             highlightTextField(passText)
         }
+    }
+
+    func signUpAction() {
+        //make sure inputs are filled in properly
+        checkForErrors()
         
         //submit user or post error message
         if errorMessages.count > 0 {
@@ -211,17 +219,17 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
                     }
                     self.handleErrors()
                 } else {
+                    //save user info
+                    let keyChainWrapper = KeychainWrapper()
+                    keyChainWrapper.mySetObject(self.passText.text, forKey: kSecValueData)
+                    keyChainWrapper.writeToKeychain()
+                    NSUserDefaults.standardUserDefaults().setBool(true, forKey: "hasLoginKey")
+                    NSUserDefaults.standardUserDefaults().setValue(self.emailText.text, forKey: "username")
+                    NSUserDefaults.standardUserDefaults().synchronize()
+                    
                     //set up application
-//                    let tabBarVC = UITabBarController()
-//                    let farmNavVC = UINavigationController()
-//                    farmNavVC.pushViewController(FarmTableViewController(), animated: false)
-//                    let profileNavVC = UINavigationController()
-//                    profileNavVC.pushViewController(ProfileTableViewController(), animated: false)
-//                    let groceryNavVC = UINavigationController()
-//                    groceryNavVC.pushViewController(GroceryBagTableViewController(), animated: false)
-//                    let VC = [farmNavVC, profileNavVC, groceryNavVC]
-//                    tabBarVC.viewControllers = VC
-//                    self.presentViewController(tabBarVC, animated: true, completion: nil)
+                    let tabBarVC = ConsumerTabBarController()
+                    self.presentViewController(tabBarVC, animated: true, completion: nil)
                 }
             })
         }
@@ -231,6 +239,41 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
     func exitPage() {
         self.dismissViewControllerAnimated(true, completion: nil)
     }
+    
+    // MARK: - TextField Delegate Methods
+    
+    func textFieldDidBeginEditing(textField: UITextField) {
+        if textField.textColor == UIColor.lightGrayColor() {
+            textField.text = nil
+            textField.textColor = UIColor.blackColor()
+            if textField.tag == 3 || textField.tag == 4 {
+                textField.secureTextEntry = true
+            }
+        }
+        textField.becomeFirstResponder()
+    }
+    
+    func textFieldDidEndEditing(textField: UITextField) {
+        if textField.text!.isEmpty {
+            if textField.tag == 3 || textField.tag == 4 {
+                textField.secureTextEntry = false
+            }
+            textField.textColor = UIColor.lightGrayColor()
+            textField.text = placeholders[textField.tag]
+        }
+        textField.resignFirstResponder()
+    }
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func dismissKeyboard() {
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
+    }
+
     
     /*
     // MARK: - Navigation

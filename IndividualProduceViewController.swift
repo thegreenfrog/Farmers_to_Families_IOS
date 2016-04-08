@@ -11,13 +11,12 @@ import Parse
 
 class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
 
-    @IBOutlet weak var produceImageView: UIImageView!
-    @IBOutlet weak var produceNameLabel: UILabel!
-    @IBOutlet weak var priceLabel: UILabel!
-    @IBOutlet weak var quantityLabel: UILabel!
+    var produceImageView: UIImageView!
+    var farmNameLabel: UILabel!
+    var priceLabel: UILabel!
+    var purchaseButton: UIButton!
     var setPriceTextField: UITextField?
-    var produceObject: PFObject?
-    var quantity: Int?
+    var produce: Produce!
     
     struct Constants {
         static let textFieldFiller = "New Price"
@@ -45,28 +44,28 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
     
     func createUnit() -> PFObject {
         let userProduceInstance = PFObject(className: "userQueuedProduce")
-        userProduceInstance[ParseKeys.ProduceNameKey] = self.produceObject![ParseKeys.ProduceNameKey]
-        if self.quantity == 0 {
+        userProduceInstance[ParseKeys.ProduceNameKey] = produce.name
+        if produce.quantity == 0 {
             let price = self.setPriceTextField?.text
             userProduceInstance[ParseKeys.ProducePriceKey] = NSNumberFormatter().numberFromString(price!)!.doubleValue
             userProduceInstance[ParseKeys.ProduceBidKey] = true
             self.setPriceTextField?.text = Constants.textFieldFiller
             self.setPriceTextField?.textColor = UIColor.lightGrayColor()
         } else {
-            userProduceInstance[ParseKeys.ProducePriceKey] = self.produceObject![ParseKeys.ProducePriceKey]
+            userProduceInstance[ParseKeys.ProducePriceKey] = produce.price
             userProduceInstance[ParseKeys.ProduceBidKey] = false
         }
-        userProduceInstance[ParseKeys.ProduceSourceObjectID] = self.produceObject?.objectId
+        userProduceInstance[ParseKeys.ProduceSourceObjectID] = self.produce.id
         userProduceInstance[ParseKeys.ProduceUnitsKey] = 1
-        userProduceInstance[ParseKeys.ProduceFarmKey] = self.produceObject![ParseKeys.ProduceFarmKey]
+        userProduceInstance[ParseKeys.ProduceFarmKey] = produce.farm
         userProduceInstance[ParseKeys.ProducePurchasedStatusKey] = false
         userProduceInstance.saveInBackground()
         return userProduceInstance
     }
     
     func updateBag() {
-        if quantity == 0 {
-            let originalPrice = produceObject![ParseKeys.ProducePriceKey] as! Float
+        if produce.quantity == 0 {
+            let originalPrice = produce.price
             if (NSNumberFormatter().numberFromString((setPriceTextField?.text)!) == nil) || NSNumberFormatter().numberFromString((setPriceTextField?.text)!)!.floatValue <= originalPrice {
                 let alert = UIAlertController(title: "Price not correctly set", message: "Please enter a numeric price value that is greater than \(originalPrice)", preferredStyle: UIAlertControllerStyle.Alert)
                 alert.addAction(UIAlertAction(
@@ -89,9 +88,9 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
                 //add info to grocerybagVC
                 let navController = self.tabBarController?.viewControllers![2] as! UINavigationController
                 let groceryVC = navController.topViewController as! GroceryBagTableViewController
-                for (index, produce) in groceryVC.produceList.enumerate() {
-                    let produceId = produce.valueForKey(ParseKeys.ProduceSourceObjectID) as? String
-                    if  produceId == self.produceObject?.objectId {
+                for (index, prod) in groceryVC.produceList.enumerate() {
+                    let produceId = prod.valueForKey(ParseKeys.ProduceSourceObjectID) as? String
+                    if  produceId == self.produce.id {
                         groceryVC.produceList[index].incrementKey(ParseKeys.ProduceUnitsKey, byAmount: 1)
                         groceryVC.produceList[index].saveInBackground()
                         print(groceryVC.produceList[index].valueForKey(ParseKeys.ProduceUnitsKey))
@@ -132,19 +131,17 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
     }
     
     func showQuantityStatus() {
-        if quantity > 5 {
-            quantityLabel.text = "In Stock"
-        } else {
-            quantityLabel.textColor = UIColor.redColor()
-            if quantity == 0 {
-                quantityLabel.text = "Out of Stock"
-            } else {
-                quantityLabel.text = "Low Stock"
-            }
-        }
+//        if produce.quantity == 0 {
+//            quantityLabel.textColor = UIColor.redColor()
+//            quantityLabel.text = "Out of Stock"
+//        } else if produce.quantity > 3 {
+//            quantityLabel.textColor = UIColor.redColor()
+//            quantityLabel.text = "Low Stock"
+//        }
     }
     
     func drawproduceImageView() {
+        produceImageView = UIImageView(frame: CGRect(origin: CGPointZero, size: CGSize(width: 200, height: 200)))
         produceImageView.image = UIImage(named: "produce_placeholder.jpg")
         produceImageView.layer.borderColor = Colors.woodColor.CGColor
         produceImageView.layer.borderWidth = 2.0
@@ -155,22 +152,51 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         produceImageView.clipsToBounds = false
     }
     
+    func drawLabels() {
+        farmNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 75)))
+        farmNameLabel.text = produce.farm
+        
+        
+        priceLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 60)))
+        priceLabel.text = "\(produce.price)"
+        
+        self.view.addSubview(priceLabel)
+        
+        purchaseButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 60)))
+        purchaseButton.setTitle("Buy a Unit", forState: .Normal)
+        self.view.addSubview(purchaseButton)
+
+        drawproduceImageView()
+        let stack1 = UIStackView(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: self.view.frame.height)))
+        stack1.addArrangedSubview(farmNameLabel)
+        stack1.addArrangedSubview(produceImageView)
+        stack1.addArrangedSubview(priceLabel)
+        stack1.addArrangedSubview(purchaseButton)
+        stack1.axis = .Vertical
+        stack1.alignment = .Center
+        stack1.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(stack1)
+        let centerXConstraint = NSLayoutConstraint(item: stack1, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
+        let centerYConstraint = NSLayoutConstraint(item: stack1, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 0)
+        self.view.addConstraint(centerXConstraint)
+        self.view.addConstraint(centerYConstraint)
+        
+    }
+    
     override func viewDidLoad() {
+        super.viewDidLoad()
         let tap = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         self.view.addGestureRecognizer(tap)
-        super.viewDidLoad()
         
-        produceNameLabel.text = produceObject![ParseKeys.ProduceNameKey] as? String
-        let price = produceObject![ParseKeys.ProducePriceKey] as? Float
-        priceLabel.text = "\(price!)"
-        self.title = produceObject![ParseKeys.ProduceFarmKey] as? String
+        drawLabels()
+        
+        self.title = produce.name
         self.navigationController?.navigationItem.rightBarButtonItem?.tintColor = UIColor.blackColor()
         self.view.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
-        drawproduceImageView()
         
         showQuantityStatus()
         
-        if quantity == 0 {
+        if produce.price == 0 {
             let labelFrame = CGRect(x: 0, y: self.view.bounds.height, width: self.view.bounds.width*2/3, height: 50)
             let inputPriceLabel = UILabel(frame: labelFrame)
             inputPriceLabel.numberOfLines = 0
@@ -196,6 +222,15 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    init(p: Produce) {
+        super.init(nibName: nil, bundle: nil)
+        produce = p
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - TextField functions
