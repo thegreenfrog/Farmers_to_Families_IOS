@@ -34,35 +34,6 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         return statusScreen
     }
     
-    //Never see transition to "Bag Updated" Screen
-    func animateHideUpdateScreen(groceryVC: GroceryBagTableViewController, updatingBagScreen: UILabel) {
-        updatingBagScreen.text = "Bag Updated"
-        UIView.animateWithDuration(1.0, delay: 1.5, options: UIViewAnimationOptions.TransitionNone, animations: { updatingBagScreen.alpha = 0.0 }, completion: { (finished: Bool) -> Void in
-            updatingBagScreen.removeFromSuperview()
-        })
-    }
-    
-    func createUnit() -> PFObject {
-        let userProduceInstance = PFObject(className: "userQueuedProduce")
-        userProduceInstance[ParseKeys.ProduceNameKey] = produce.name
-        if produce.quantity == 0 {
-            let price = self.setPriceTextField?.text
-            userProduceInstance[ParseKeys.ProducePriceKey] = NSNumberFormatter().numberFromString(price!)!.doubleValue
-            userProduceInstance[ParseKeys.ProduceBidKey] = true
-            self.setPriceTextField?.text = Constants.textFieldFiller
-            self.setPriceTextField?.textColor = UIColor.lightGrayColor()
-        } else {
-            userProduceInstance[ParseKeys.ProducePriceKey] = produce.price
-            userProduceInstance[ParseKeys.ProduceBidKey] = false
-        }
-        userProduceInstance[ParseKeys.ProduceSourceObjectID] = self.produce.id
-        userProduceInstance[ParseKeys.ProduceUnitsKey] = 1
-        userProduceInstance[ParseKeys.ProduceFarmKey] = produce.farm
-        userProduceInstance[ParseKeys.ProducePurchasedStatusKey] = false
-        userProduceInstance.saveInBackground()
-        return userProduceInstance
-    }
-    
     func updateBag() {
         if produce.quantity == 0 {
             let originalPrice = produce.price
@@ -83,32 +54,64 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         UIView.animateWithDuration(1.0,
             animations: {updatingBagScreen.alpha = 1.0},
             completion: {finished in
+                //see if the user has already added one unit of this produce to its bag
+                let findThisProduceInBag = PFQuery(className: "groceryProduce")
+                findThisProduceInBag.whereKey("produceId", equalTo: self.produce.id)
+                findThisProduceInBag.getFirstObjectInBackgroundWithBlock({ (object, err) -> Void in
+                    if let found = object {//if found, then just increment quantity
+                        found.incrementKey("quantity")
+                        found.saveInBackground()
+                        updatingBagScreen.text = "Bag Updated"
+                        UIView.animateWithDuration(1.0, delay: 1.5, options: UIViewAnimationOptions.TransitionNone, animations: { updatingBagScreen.alpha = 0.0 }, completion: { (finished: Bool) -> Void in
+                            updatingBagScreen.removeFromSuperview()
+                        })
+                        return
+                    } else {
+                        /*
+                        Adds the current produce to the grocery bag by adding another instance of the class "groceryProduce"
+                        */
+                        let produceObject = PFObject(className: "groceryProduce")
+                        produceObject.setValue(self.produce.name, forKey: "produce")
+                        produceObject.setValue(self.produce.farm, forKey: "farm")
+                        produceObject.setValue(self.produce.price, forKey: "price")
+                        produceObject.setValue(NSUserDefaults.standardUserDefaults().valueForKey("username"), forKey: "username")
+                        produceObject.setValue(1, forKey: "quantity")
+                        produceObject.setValue(self.produce.id, forKey: "produceId")
+                        produceObject.saveInBackground()
+                        //show "Bag Updated" and then hide dissolve the view
+                        updatingBagScreen.text = "Bag Updated"
+                        UIView.animateWithDuration(1.0, delay: 1.5, options: UIViewAnimationOptions.TransitionNone, animations: { updatingBagScreen.alpha = 0.0 }, completion: { (finished: Bool) -> Void in
+                            updatingBagScreen.removeFromSuperview()
+                        })
+                    }
+                })
 
+                
                 //update bag
                 //add info to grocerybagVC
-                let navController = self.tabBarController?.viewControllers![2] as! UINavigationController
-                let groceryVC = navController.topViewController as! GroceryBagTableViewController
-                for (index, prod) in groceryVC.produceList.enumerate() {
-                    let produceId = prod.valueForKey(ParseKeys.ProduceSourceObjectID) as? String
-                    if  produceId == self.produce.id {
-                        groceryVC.produceList[index].incrementKey(ParseKeys.ProduceUnitsKey, byAmount: 1)
-                        groceryVC.produceList[index].saveInBackground()
-                        print(groceryVC.produceList[index].valueForKey(ParseKeys.ProduceUnitsKey))
-                        self.animateHideUpdateScreen(groceryVC, updatingBagScreen: updatingBagScreen)
-                        groceryVC.tableView.reloadData()
-                        return
-                    }
-                }
-                groceryVC.produceList.append(self.createUnit())
-                groceryVC.tableView.reloadData()
-                self.animateHideUpdateScreen(groceryVC, updatingBagScreen: updatingBagScreen)
+//                let navController = self.tabBarController?.viewControllers![2] as! UINavigationController
+//                let groceryVC = navController.topViewController as! GroceryBagTableViewController
+//                for (index, prod) in groceryVC.produceList.enumerate() {
+//                    let produceId = prod.valueForKey(ParseKeys.ProduceSourceObjectID) as? String
+//                    if  produceId == self.produce.id {
+//                        groceryVC.produceList[index].incrementKey(ParseKeys.ProduceUnitsKey, byAmount: 1)
+//                        groceryVC.produceList[index].saveInBackground()
+//                        print(groceryVC.produceList[index].valueForKey(ParseKeys.ProduceUnitsKey))
+//                        self.animateHideUpdateScreen(groceryVC, updatingBagScreen: updatingBagScreen)
+//                        groceryVC.tableView.reloadData()
+//                        return
+//                    }
+//                }
+//                groceryVC.produceList.append(self.createUnit())
+//                groceryVC.tableView.reloadData()
+//                self.animateHideUpdateScreen(groceryVC, updatingBagScreen: updatingBagScreen)
                 //animate in "bag updated" screen
         })
         
         
     }
     
-    @IBAction func buyUnitAction(sender: UIButton) {
+    func buyUnitAction() {
         updateBag()
     }
     
@@ -164,6 +167,7 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         
         purchaseButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 60)))
         purchaseButton.setTitle("Buy a Unit", forState: .Normal)
+        purchaseButton.addTarget(self, action: "buyUnitAction", forControlEvents: .TouchUpInside)
         self.view.addSubview(purchaseButton)
 
         drawproduceImageView()

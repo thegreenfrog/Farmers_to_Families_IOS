@@ -35,42 +35,53 @@ class GroceryBagTableViewController: UITableViewController {
         self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
         self.tableView.registerClass(GroceryBagTableViewCell.self, forCellReuseIdentifier: NSStringFromClass(GroceryBagTableViewCell))
+        self.tableView.rowHeight = UITableViewAutomaticDimension
+        self.tableView.estimatedRowHeight = 160.0
         
     }
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         
-        if produceList.count == 0 {
-            let frame = CGRectMake(0, self.view.bounds.midY, self.view.bounds.width, 40)
-            noProduceLabel = UILabel(frame: frame)
-            noProduceLabel!.text = "No Produce in Bag"
-            noProduceLabel!.textAlignment = .Center
-            noProduceLabel!.textColor = UIColor.darkGrayColor()
-            self.view.addSubview(noProduceLabel!)
-        }
-        
-        if(produceList.count > 0 && CheckoutButton == nil) {
-            if noProduceLabel != nil {
-                noProduceLabel?.removeFromSuperview()
-                noProduceLabel = nil
+        let getBag = PFQuery(className: "groceryProduce")
+        getBag.whereKey("username", equalTo: NSUserDefaults.standardUserDefaults().valueForKey("username")!)
+        getBag.findObjectsInBackgroundWithBlock({ (objects, err) -> Void in
+            if err != nil {
+                print(err)
+                return
             }
-            CheckoutButton = UIButton()
-            CheckoutButton?.setTitle("Checkout", forState: .Normal)
-            CheckoutButton?.frame = CGRectMake(0, self.view.bounds.maxY - (self.tabBarController?.tabBar.bounds.height)!, self.view.bounds.width, Constants.CheckoutButtonHeight)
-            CheckoutButton?.addTarget(self, action: "CheckoutAction:", forControlEvents: .TouchUpInside)
-            CheckoutButton?.center.y -= 50
-            CheckoutButton?.backgroundColor = UIColor.blackColor()
-            self.view.addSubview(CheckoutButton!)
+            if let produce = objects {
+                print(produce.count)
+                self.produceList = produce
+            }
             
-            let rightConstraint = NSLayoutConstraint(item: CheckoutButton!, attribute: NSLayoutAttribute.TrailingMargin, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.TrailingMargin, multiplier: 1, constant: 0)
-            self.view.addConstraint(rightConstraint)
-            let leftConstraint = NSLayoutConstraint(item: self.view, attribute: NSLayoutAttribute.LeadingMargin, relatedBy: NSLayoutRelation.Equal, toItem: CheckoutButton, attribute: NSLayoutAttribute.LeadingMargin, multiplier: 1, constant: 0)
-            self.view.addConstraint(leftConstraint)
-            let bottomConstraint = NSLayoutConstraint(item: self.view, attribute: NSLayoutAttribute.BottomMargin, relatedBy: NSLayoutRelation.Equal, toItem: CheckoutButton, attribute: NSLayoutAttribute.BottomMargin, multiplier: 1, constant: 0)
-            self.view.addConstraint(bottomConstraint)
-        }
-
+            if self.produceList.count == 0 {//tell user that there is no produce in bag
+                let frame = CGRectMake(0, self.view.bounds.midY, self.view.bounds.width, 40)
+                self.noProduceLabel = UILabel(frame: frame)
+                self.noProduceLabel!.text = "No Produce in Bag"
+                self.noProduceLabel!.textAlignment = .Center
+                self.noProduceLabel!.textColor = UIColor.darkGrayColor()
+                self.view.addSubview(self.noProduceLabel!)
+            }
+            
+            if(self.produceList.count > 0 && self.CheckoutButton == nil) {
+                if self.noProduceLabel != nil {//hide "no produce in bag" label if still showing
+                    self.noProduceLabel?.removeFromSuperview()
+                    self.noProduceLabel = nil
+                }
+                //show checkout button
+                self.CheckoutButton = UIButton()
+                self.CheckoutButton?.setTitle("Checkout", forState: .Normal)
+                self.CheckoutButton?.frame = CGRectMake(0, self.view.bounds.maxY - (self.tabBarController?.tabBar.bounds.height)!, self.view.bounds.width, Constants.CheckoutButtonHeight)
+                self.CheckoutButton?.addTarget(self, action: "CheckoutAction:", forControlEvents: .TouchUpInside)
+                self.CheckoutButton?.center.y -= 50
+                self.CheckoutButton?.backgroundColor = UIColor.blackColor()
+                self.view.addSubview(self.CheckoutButton!)
+                let centerXConstraint = NSLayoutConstraint(item: self.CheckoutButton!, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
+                self.view.addConstraint(centerXConstraint)
+            }
+            self.tableView.reloadData()
+        })
     }
 
     override func didReceiveMemoryWarning() {
@@ -180,13 +191,13 @@ class GroceryBagTableViewController: UITableViewController {
     
     func savePurchaseHistory(produce: PFObject, inout orderObject: PFObject, orderID: NSString, inout orderRelation: PFRelation, inout totalProduce: Int) -> PFObject {
         let purchasedProduce = PFObject.init(className: ParseKeys.UserOrderProduceClassName)
-        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceNameKey), forKey: ParseKeys.ProduceNameKey)
-        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceSourceObjectID), forKey: ParseKeys.ProduceSourceObjectID)
-        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProducePriceKey), forKey: ParseKeys.ProducePriceKey)
+        purchasedProduce.setValue(produce["produce"] as? String, forKey: ParseKeys.ProduceNameKey)
+        purchasedProduce.setValue(produce["produceId"] as? String, forKey: ParseKeys.ProduceSourceObjectID)
+        purchasedProduce.setValue(produce["price"] as? Float, forKey: ParseKeys.ProducePriceKey)
         purchasedProduce.setValue(orderID, forKey: ParseKeys.UserOrderId)
-        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceFarmKey), forKey: ParseKeys.ProduceFarmKey)
-        purchasedProduce.setValue(produce.valueForKey(ParseKeys.ProduceUnitsKey), forKey: ParseKeys.ProduceUnitsKey)
-        purchasedProduce.setValue(PFUser.currentUser()!.username!, forKey: ParseKeys.UserOrderUser)
+        purchasedProduce.setValue(produce["farm"] as? String, forKey: ParseKeys.ProduceFarmKey)
+        purchasedProduce.setValue(produce["quantity"] as? Int, forKey: ParseKeys.ProduceUnitsKey)
+        purchasedProduce.setValue(NSUserDefaults.standardUserDefaults().valueForKey("username"), forKey: ParseKeys.UserOrderUser)
         return purchasedProduce
     }
     
@@ -199,38 +210,38 @@ class GroceryBagTableViewController: UITableViewController {
         var totalProduce = self.produceList.count
         for produce in self.produceList {
             //check if outbid product. 
-            let didBid = produce[ParseKeys.ProduceBidKey] as! Bool
-            if didBid {
-                replaceOtherBid(produce[ParseKeys.ProduceSourceObjectID] as! String)
-                let purchasedProduce = savePurchaseHistory(produce, orderObject: &orderObject, orderID: orderID, orderRelation: &orderRelation, totalProduce: &totalProduce)
-                purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
-                    if success {
-                        orderRelation.addObject(purchasedProduce)
-                    }
-                    totalProduce--
-                    if totalProduce == 0 {
-                        orderObject.saveInBackground()//always make sure you save this after you finish with pfRelation
-                    }
-                }
-                continue
-            }
+//            let didBid = produce[ParseKeys.ProduceBidKey] as! Bool
+//            if didBid {
+//                replaceOtherBid(produce[ParseKeys.ProduceSourceObjectID] as! String)
+//                let purchasedProduce = savePurchaseHistory(produce, orderObject: &orderObject, orderID: orderID, orderRelation: &orderRelation, totalProduce: &totalProduce)
+//                purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
+//                    if success {
+//                        orderRelation.addObject(purchasedProduce)
+//                    }
+//                    totalProduce--
+//                    if totalProduce == 0 {
+//                        orderObject.saveInBackground()//always make sure you save this after you finish with pfRelation
+//                    }
+//                }
+//                continue
+//            }
             
             //retrieve updated produce information
-            let produceQuantity = produce[ParseKeys.ProduceUnitsKey] as! Int
-            let objectQuery = PFQuery(className: ParseKeys.CurrentProduceClassName)
-            objectQuery.whereKey(ParseKeys.PFObjectObjectID, equalTo: produce.valueForKey(ParseKeys.ProduceSourceObjectID)! as! String)
+            let produceQuantity = produce["quantity"] as! Int
+            let objectQuery = PFQuery(className: "AvailableProduce")
+            objectQuery.whereKey(ParseKeys.PFObjectObjectID, equalTo: produce["produceId"] as! String)
             objectQuery.getFirstObjectInBackgroundWithBlock{ (object, error) in
                 //check to make sure object still exists, enough inventory to make purchase
                 if error != nil || object == nil || (object?.valueForKey(ParseKeys.ProduceUnitsKey) as! Int) < produceQuantity{
                     //notify user purchase could not be done
-                    self.showCheckoutError(produce[ParseKeys.ProduceNameKey] as! String)
+                    self.showCheckoutError(produce["produce"] as! String)
                     return
                 }
                 object!.incrementKey(ParseKeys.ProduceUnitsKey, byAmount: -produceQuantity)
                 object!.saveInBackground()
                 //create purchase history
                 let purchasedProduce = self.savePurchaseHistory(produce, orderObject: &orderObject, orderID: orderID, orderRelation: &orderRelation, totalProduce: &totalProduce)
-                purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
+                purchasedProduce.saveInBackgroundWithBlock{ (success, error) -> Void in
                     if success {
                         orderRelation.addObject(purchasedProduce)
                     }
@@ -241,6 +252,10 @@ class GroceryBagTableViewController: UITableViewController {
                 }
             }
             
+        }
+        //remove all elements from groceryBag class
+        for prod in produceList {
+            prod.deleteInBackground()
         }
         produceList = []
         self.tableView.reloadData()
@@ -288,17 +303,21 @@ class GroceryBagTableViewController: UITableViewController {
 
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(Constants.cellIdentifier, forIndexPath: indexPath) as! GroceryBagTableViewCell
+        var cell = tableView.dequeueReusableCellWithIdentifier(NSStringFromClass(GroceryBagTableViewCell), forIndexPath: indexPath) as? GroceryBagTableViewCell
+        if cell == nil {
+            cell = UITableViewCell(style: .Default, reuseIdentifier: NSStringFromClass(GroceryBagTableViewCell)) as? GroceryBagTableViewCell
+        }
         let produce = produceList[indexPath.row]
-        cell.produceNameLabel.text = produce[ParseKeys.ProduceNameKey] as? String
-        let produceNum = produce[ParseKeys.ProduceUnitsKey] as? Int
-        cell.produceCountLabel.text = "\(produceNum!)"
-        let price = produce[ParseKeys.ProducePriceKey] as? Float
-        cell.priceLabel.text = "$\(price!)"
-        cell.farmNameLabel.text = produce[ParseKeys.ProduceFarmKey] as? String
-        cell.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
+        let name = produce["produce"] as? String
+        cell!.produceNameLabel.text = name
+        let produceNum = produce["quantity"] as? Int
+        cell!.produceCountLabel.text = "\(produceNum!)"
+        let price = produce["price"] as? Float
+        cell!.priceLabel.text = "$\(price!)"
+        cell!.farmNameLabel.text = produce["farm"] as? String
+        cell!.backgroundColor = UIColor(red: 245/255, green: 222/255, blue: 179/255, alpha: 1.0)
         
-        return cell
+        return cell!
     }
     
     override func setEditing(editing: Bool, animated: Bool) {
@@ -321,6 +340,10 @@ class GroceryBagTableViewController: UITableViewController {
             return UITableViewCellEditingStyle.Delete
         }
         return UITableViewCellEditingStyle.None
+    }
+    
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 100.0
     }
 
     /*
