@@ -74,10 +74,8 @@ class ConsumerSignInViewController: UIViewController, UITextFieldDelegate {
         screenStackView.alignment = .Fill
         screenStackView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(screenStackView)
-        let centerXConstraint = NSLayoutConstraint(item: screenStackView, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let centerYConstraint = NSLayoutConstraint(item: screenStackView, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 0)
-        self.view.addConstraint(centerXConstraint)
-        self.view.addConstraint(centerYConstraint)
+        screenStackView.centerXAnchor.constraintEqualToAnchor(self.view.centerXAnchor).active = true
+        screenStackView.centerYAnchor.constraintEqualToAnchor(self.view.centerYAnchor).active = true
         
         self.view.addSubview(exitButton)
         exitButton.topAnchor.constraintEqualToAnchor(self.view.topAnchor, constant: 50).active = true

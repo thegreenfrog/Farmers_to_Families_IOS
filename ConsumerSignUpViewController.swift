@@ -19,14 +19,12 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         static let NoretypePassword = "Please re-enter the same password"
         
         static let EmailRegex = "[^@]+[@][a-z0-9]+[.][a-z]*"
-        
-        static let ErrorBorderWidth:CGFloat = 1.0
-        static let ErrorMessageProportionHeight:CGFloat = 20.0
-        static let ErrorMessageWidth:CGFloat = 200.0
+
     }
     
     let placeholders = ["First Name", "Last Name", "Username (email)", "Password", "Retype Password"]
     
+    var exitButton: UIButton!
     var firstNameText: UITextField!
     var lastNameText: UITextField!
     var emailText: UITextField!
@@ -36,11 +34,16 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
     var signUpButton: UIButton!
     
     var errorMessages = [String]()
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        firstNameText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 100)))
+    
+    func drawScreen() {
+        exitButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 75)))
+        exitButton.setTitle("X", forState: .Normal)
+        exitButton.titleLabel!.font = UIFont.systemFontOfSize(30)
+        exitButton.setTitleColor(UIColor.grayColor(), forState: .Normal)
+        exitButton.translatesAutoresizingMaskIntoConstraints = false
+        exitButton.addTarget(self, action: "exitPage", forControlEvents: .TouchUpInside)
+        
+        firstNameText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         firstNameText.borderStyle = .Line
         firstNameText.tag = 0
         firstNameText.font = UIFont.systemFontOfSize(30)
@@ -49,15 +52,8 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         firstNameText.textColor = UIColor.lightGrayColor()
         firstNameText.delegate = self
         firstNameText.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(firstNameText)
-        let firstNameCenterXConstraint = NSLayoutConstraint(item: firstNameText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let firstNameLeftConstraint = NSLayoutConstraint(item: firstNameText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let firstNameCenterYContraint = NSLayoutConstraint(item: firstNameText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -200)
-        self.view.addConstraint(firstNameCenterXConstraint)
-        self.view.addConstraint(firstNameCenterYContraint)
-        self.view.addConstraint(firstNameLeftConstraint)
         
-        lastNameText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 100)))
+        lastNameText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         lastNameText.borderStyle = .Line
         lastNameText.tag = 1
         lastNameText.font = UIFont.systemFontOfSize(30)
@@ -66,15 +62,8 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         lastNameText.textColor = UIColor.lightGrayColor()
         lastNameText.delegate = self
         lastNameText.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(lastNameText)
-        let lastNameCenterXConstraint = NSLayoutConstraint(item: lastNameText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let lastNameLeftConstraint = NSLayoutConstraint(item: lastNameText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let lastNameCenterYContraint = NSLayoutConstraint(item: lastNameText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -150)
-        self.view.addConstraint(lastNameCenterXConstraint)
-        self.view.addConstraint(lastNameCenterYContraint)
-        self.view.addConstraint(lastNameLeftConstraint)
         
-        emailText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 100)))
+        emailText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         emailText.borderStyle = .Line
         emailText.tag = 2
         emailText.font = UIFont.systemFontOfSize(30)
@@ -83,15 +72,8 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         emailText.textColor = UIColor.lightGrayColor()
         emailText.delegate = self
         emailText.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(emailText)
-        let emailCenterXConstraint = NSLayoutConstraint(item: emailText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let emailLeftConstraint = NSLayoutConstraint(item: emailText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let emailCenterYContraint = NSLayoutConstraint(item: emailText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -100)
-        self.view.addConstraint(emailCenterXConstraint)
-        self.view.addConstraint(emailCenterYContraint)
-        self.view.addConstraint(emailLeftConstraint)
         
-        passText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 100)))
+        passText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         passText.borderStyle = .Line
         passText.tag = 3
         passText.font = UIFont.systemFontOfSize(30)
@@ -100,15 +82,8 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         passText.textColor = UIColor.lightGrayColor()
         passText.delegate = self
         passText.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(passText)
-        let passCenterXConstraint = NSLayoutConstraint(item: passText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let passLeftConstraint = NSLayoutConstraint(item: passText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let passCenterYContraint = NSLayoutConstraint(item: passText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: -50)
-        self.view.addConstraint(passCenterXConstraint)
-        self.view.addConstraint(passCenterYContraint)
-        self.view.addConstraint(passLeftConstraint)
         
-        retypePassText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 100)))
+        retypePassText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         retypePassText.borderStyle = .Line
         retypePassText.tag = 4
         retypePassText.font = UIFont.systemFontOfSize(30)
@@ -117,27 +92,43 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         retypePassText.textColor = UIColor.lightGrayColor()
         retypePassText.delegate = self
         retypePassText.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(retypePassText)
-        let retypeCenterXConstraint = NSLayoutConstraint(item: retypePassText, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let retypeLeftConstraint = NSLayoutConstraint(item: retypePassText, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let retypeCenterYContraint = NSLayoutConstraint(item: retypePassText, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 0)
-        self.view.addConstraint(retypeCenterXConstraint)
-        self.view.addConstraint(retypeCenterYContraint)
-        self.view.addConstraint(retypeLeftConstraint)
         
-        signUpButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width-10, height: 75)))
+        signUpButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 75)))
         signUpButton.setTitle("Sign Up", forState: .Normal)
         signUpButton.backgroundColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
         signUpButton.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(signUpButton)
-        let signUpCenterXConstraint = NSLayoutConstraint(item: signUpButton, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let signUpLeftConstraint = NSLayoutConstraint(item: signUpButton, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 10)
-        let signUpCenterYContraint = NSLayoutConstraint(item: signUpButton, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 50)
-        self.view.addConstraint(signUpCenterXConstraint)
-        self.view.addConstraint(signUpCenterYContraint)
-        self.view.addConstraint(signUpLeftConstraint)
         signUpButton.addTarget(self, action: "signUpAction", forControlEvents: .TouchUpInside)
         
+        let screenStackView = UIStackView()
+        screenStackView.addArrangedSubview(firstNameText)
+        screenStackView.addArrangedSubview(lastNameText)
+        screenStackView.addArrangedSubview(passText)
+        screenStackView.addArrangedSubview(retypePassText)
+        
+        let fillerView = UIView()
+        fillerView.translatesAutoresizingMaskIntoConstraints = false
+        fillerView.heightAnchor.constraintEqualToConstant(20).active = true
+        screenStackView.addArrangedSubview(fillerView)
+        screenStackView.addArrangedSubview(signUpButton)
+        screenStackView.alignment = .Fill
+        screenStackView.axis = .Vertical
+        screenStackView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(screenStackView)
+        screenStackView.widthAnchor.constraintGreaterThanOrEqualToAnchor(self.view.widthAnchor, constant: -25).active = true
+        print("\(screenStackView.frame.width), \(self.view.bounds.width)")
+        screenStackView.centerXAnchor.constraintEqualToAnchor(self.view.centerXAnchor).active = true
+        screenStackView.centerYAnchor.constraintEqualToAnchor(self.view.centerYAnchor, constant: -75).active = true
+        
+        self.view.addSubview(exitButton)
+        exitButton.topAnchor.constraintEqualToAnchor(self.view.topAnchor, constant: 50).active = true
+        exitButton.trailingAnchor.constraintEqualToAnchor(self.view.trailingAnchor, constant: -12).active = true
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        drawScreen()
+        self.view.backgroundColor = Colors.lightBrown
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         view.addGestureRecognizer(tap)
     }
