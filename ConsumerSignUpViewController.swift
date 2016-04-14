@@ -147,52 +147,42 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    func highlightTextField(textField: UITextField) {
-        textField.layer.borderWidth = Constants.ErrorBorderWidth
-        textField.layer.borderColor = UIColor.redColor().CGColor
-    }
-    
     func handleErrors() {
-        let frame = CGRect(origin: CGPointZero, size: CGSize(width: Constants.ErrorMessageWidth, height: Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)))
-        let errorSubView = UIView(frame: frame)
-        errorSubView.center.x = signUpButton.center.x
-        errorSubView.center.y = signUpButton.center.y + Constants.ErrorMessageProportionHeight * CGFloat(errorMessages.count)
-        errorSubView.layer.borderColor = UIColor.redColor().CGColor
-        errorSubView.layer.borderWidth = Constants.ErrorBorderWidth
-        var count = 0
+        var allErrors = ""
+        var first = true
         for error in errorMessages {
-            let labelOrigin = CGPoint(x: errorSubView.layer.bounds.origin.x, y: errorSubView.layer.bounds.origin.y + Constants.ErrorMessageProportionHeight * CGFloat(count))
-            let errorFrame = CGRect(origin: labelOrigin, size: CGSize(width: Constants.ErrorMessageWidth, height: Constants.ErrorMessageProportionHeight))
-            let label = UILabel(frame: errorFrame)
-            label.text = error
-            label.lineBreakMode = NSLineBreakMode.ByWordWrapping
-            label.font = UIFont(name: label.font.fontName, size: 10)
-            errorSubView.addSubview(label)
-            count++
+            if(!first) {
+                allErrors += "\n"
+            }
+            allErrors += error
+            first = false
         }
-        self.view.addSubview(errorSubView)
+        let alert = UIAlertController(title: nil, message: allErrors, preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
+        presentViewController(alert, animated: true, completion: nil)
+        errorMessages = []
     }
     
     func checkForErrors() {
         if firstNameText.textColor == UIColor.lightGrayColor() {
             errorMessages.append(Constants.NoFirstName)
-            highlightTextField(firstNameText)
+            return
         }
         if lastNameText.textColor == UIColor.lightGrayColor() {
             errorMessages.append(Constants.NoLastName)
-            highlightTextField(lastNameText)
+            return
         }
         if emailText.textColor == UIColor.lightGrayColor() || emailText.text?.rangeOfString(Constants.EmailRegex, options: .RegularExpressionSearch) == nil {
             errorMessages.append(Constants.Noemail)
-            highlightTextField(emailText)
+            return
         }
         if passText.textColor == UIColor.lightGrayColor() || passText.text!.characters.count < 6 {
             errorMessages.append(Constants.NoPassword)
-            highlightTextField(passText)
+            return
         }
         if passText.textColor == UIColor.lightGrayColor() || retypePassText.text!.characters.count != passText.text!.characters.count {
             errorMessages.append(Constants.NoretypePassword)
-            highlightTextField(passText)
+            return
         }
     }
 

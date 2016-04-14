@@ -189,6 +189,7 @@ class GroceryBagTableViewController: UITableViewController {
         return randomString
     }
     
+    //helper function to create "userOrder" class instance for this order
     func savePurchaseHistory(produce: PFObject, inout orderObject: PFObject, orderID: NSString, inout orderRelation: PFRelation, inout totalProduce: Int) -> PFObject {
         let purchasedProduce = PFObject.init(className: ParseKeys.UserOrderProduceClassName)
         purchasedProduce.setValue(produce["produce"] as? String, forKey: ParseKeys.ProduceNameKey)
@@ -201,7 +202,9 @@ class GroceryBagTableViewController: UITableViewController {
         return purchasedProduce
     }
     
+    //function called to handle user checkout
     func ExecuteCheckout() {
+        //create class instance
         var orderObject = PFObject.init(className: ParseKeys.UserOrderClassName)
         let orderID = randomStringWithLength(7)
         orderObject.setObject(orderID, forKey: ParseKeys.UserOrderId)
@@ -210,21 +213,21 @@ class GroceryBagTableViewController: UITableViewController {
         var totalProduce = self.produceList.count
         for produce in self.produceList {
             //check if outbid product. 
-//            let didBid = produce[ParseKeys.ProduceBidKey] as! Bool
-//            if didBid {
-//                replaceOtherBid(produce[ParseKeys.ProduceSourceObjectID] as! String)
-//                let purchasedProduce = savePurchaseHistory(produce, orderObject: &orderObject, orderID: orderID, orderRelation: &orderRelation, totalProduce: &totalProduce)
-//                purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
-//                    if success {
-//                        orderRelation.addObject(purchasedProduce)
-//                    }
-//                    totalProduce--
-//                    if totalProduce == 0 {
-//                        orderObject.saveInBackground()//always make sure you save this after you finish with pfRelation
-//                    }
-//                }
-//                continue
-//            }
+            let didBid = produce[ParseKeys.ProduceBidKey] as! Bool
+            if didBid {
+                replaceOtherBid(produce[ParseKeys.ProduceSourceObjectID] as! String)
+                let purchasedProduce = savePurchaseHistory(produce, orderObject: &orderObject, orderID: orderID, orderRelation: &orderRelation, totalProduce: &totalProduce)
+                purchasedProduce.saveInBackgroundWithBlock{ (success, error) in
+                    if success {
+                        orderRelation.addObject(purchasedProduce)
+                    }
+                    totalProduce--
+                    if totalProduce == 0 {
+                        orderObject.saveInBackground()//always make sure you save this after you finish with pfRelation
+                    }
+                }
+                continue
+            }
             
             //retrieve updated produce information
             let produceQuantity = produce["quantity"] as! Int
@@ -253,7 +256,7 @@ class GroceryBagTableViewController: UITableViewController {
             }
             
         }
-        //remove all elements from groceryBag class
+        //remove all elements from groceryBag class now that order has been processed
         for prod in produceList {
             prod.deleteInBackground()
         }

@@ -37,13 +37,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
         
-        if NSUserDefaults.standardUserDefaults().boolForKey("hasLoginKey") {
-            let tabBarVC = ConsumerTabBarController()
-            self.window?.rootViewController = tabBarVC
-        } else {
+//        if NSUserDefaults.standardUserDefaults().boolForKey("hasLoginKey") {
+//            let tabBarVC = ConsumerTabBarController()
+//            self.window?.rootViewController = tabBarVC
+//        } else {
             let registerVC = RegisterViewController()
             self.window?.rootViewController = registerVC
-        }
+        //}
         
         /*init some hardcoded farms*/
         //        let rockyClass = PFObject(className: "FarmClass")
