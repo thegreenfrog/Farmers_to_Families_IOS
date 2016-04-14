@@ -21,6 +21,8 @@ class FarmerRegisterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.view.backgroundColor = Colors.lightBrown
+        
         signInButton = UIButton(frame: Constants.buttonFrame)
         signInButton.backgroundColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
         signInButton.setTitle("Sign In", forState: .Normal)

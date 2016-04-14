@@ -114,8 +114,7 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         screenStackView.axis = .Vertical
         screenStackView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(screenStackView)
-        screenStackView.widthAnchor.constraintGreaterThanOrEqualToAnchor(self.view.widthAnchor, constant: -25).active = true
-        print("\(screenStackView.frame.width), \(self.view.bounds.width)")
+        screenStackView.widthAnchor.constraintEqualToAnchor(self.view.widthAnchor, constant: -25).active = true
         screenStackView.centerXAnchor.constraintEqualToAnchor(self.view.centerXAnchor).active = true
         screenStackView.centerYAnchor.constraintEqualToAnchor(self.view.centerYAnchor, constant: -75).active = true
         

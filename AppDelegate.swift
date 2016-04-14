@@ -43,7 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        } else {
             let registerVC = RegisterViewController()
             self.window?.rootViewController = registerVC
-        //}
+//        }
         
         /*init some hardcoded farms*/
         //        let rockyClass = PFObject(className: "FarmClass")

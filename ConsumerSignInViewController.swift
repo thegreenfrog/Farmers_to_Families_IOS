@@ -34,7 +34,8 @@ class ConsumerSignInViewController: UIViewController, UITextFieldDelegate {
     
     func drawScreen() {
         exitButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: 75, height: 75)))
-        exitButton.tintColor = UIColor.grayColor()
+        exitButton.setTitleColor(UIColor.grayColor(), forState: .Normal)
+        exitButton.titleLabel!.font = UIFont.systemFontOfSize(30)
         exitButton.setTitle("X", forState: .Normal)
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         exitButton.addTarget(self, action: "exitPage", forControlEvents: .TouchUpInside)
@@ -64,22 +65,27 @@ class ConsumerSignInViewController: UIViewController, UITextFieldDelegate {
         signInButton.backgroundColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
         signInButton.translatesAutoresizingMaskIntoConstraints = false
         signInButton.addTarget(self, action: "signInAction", forControlEvents: .TouchUpInside)
-
         
         let screenStackView = UIStackView(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: self.view.frame.height)))
         screenStackView.addArrangedSubview(emailTextField)
         screenStackView.addArrangedSubview(passwordTextField)
+        let fillerView = UIView()
+        fillerView.translatesAutoresizingMaskIntoConstraints = false
+        fillerView.heightAnchor.constraintEqualToConstant(20).active = true
+        screenStackView.addArrangedSubview(fillerView)
         screenStackView.addArrangedSubview(signInButton)
         screenStackView.axis = .Vertical
         screenStackView.alignment = .Fill
         screenStackView.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(screenStackView)
+        
+        screenStackView.widthAnchor.constraintEqualToAnchor(self.view.widthAnchor, constant: -25).active = true
         screenStackView.centerXAnchor.constraintEqualToAnchor(self.view.centerXAnchor).active = true
-        screenStackView.centerYAnchor.constraintEqualToAnchor(self.view.centerYAnchor).active = true
+        screenStackView.centerYAnchor.constraintEqualToAnchor(self.view.centerYAnchor, constant: -75).active = true
         
         self.view.addSubview(exitButton)
         exitButton.topAnchor.constraintEqualToAnchor(self.view.topAnchor, constant: 50).active = true
-        exitButton.trailingAnchor.constraintEqualToAnchor(self.view.trailingAnchor, constant: -50).active = true
+        exitButton.trailingAnchor.constraintEqualToAnchor(self.view.trailingAnchor, constant: -12).active = true
         
     }
     
