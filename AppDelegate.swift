@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            let tabBarVC = ConsumerTabBarController()
 //            self.window?.rootViewController = tabBarVC
 //        } else {
-            let registerVC = RegisterViewController()
+            let registerVC = WelcomePageViewController(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
             self.window?.rootViewController = registerVC
 //        }
         

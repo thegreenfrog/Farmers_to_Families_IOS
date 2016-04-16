@@ -21,34 +21,33 @@ class FarmerRegisterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.backgroundColor = Colors.lightBrown
+        self.view.backgroundColor = UIColor.clearColor()
         
         signInButton = UIButton(frame: Constants.buttonFrame)
         signInButton.backgroundColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
         signInButton.setTitle("Sign In", forState: .Normal)
         signInButton.layer.masksToBounds = true
         signInButton.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(signInButton)
-        let farmerXConstraint = NSLayoutConstraint(item: signInButton, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let farmerYConstraint = NSLayoutConstraint(item: signInButton, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 40)
-        self.view.addConstraint(farmerXConstraint)
-        self.view.addConstraint(farmerYConstraint)
         signInButton.addTarget(self, action: "showSignIn", forControlEvents: .TouchUpInside)
         
         signUpButton = UIButton(frame: Constants.buttonFrame)
         signUpButton.backgroundColor = UIColor.clearColor()
-        signUpButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        signUpButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         signUpButton.setTitle("Sign Up", forState: .Normal)
         signUpButton.layer.masksToBounds = true
         signUpButton.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(signUpButton)
-        let consumerXConstraint = NSLayoutConstraint(item: signUpButton, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let consumerYConstraint = NSLayoutConstraint(item: signUpButton, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 100)
-        self.view.addConstraint(consumerXConstraint)
-        self.view.addConstraint(consumerYConstraint)
         signUpButton.addTarget(self, action: "showSignUp", forControlEvents: .TouchUpInside)
         
-        // Do any additional setup after loading the view.
+        let screenStackView = UIStackView()
+        screenStackView.addArrangedSubview(signInButton)
+        screenStackView.addArrangedSubview(signUpButton)
+        screenStackView.axis = .Vertical
+        screenStackView.alignment = .Fill
+        screenStackView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(screenStackView)
+        screenStackView.centerXAnchor.constraintEqualToAnchor(self.view.centerXAnchor).active = true
+        screenStackView.centerYAnchor.constraintEqualToAnchor(self.view.centerYAnchor, constant: 25).active = true
+        screenStackView.widthAnchor.constraintEqualToAnchor(self.view.widthAnchor, multiplier: 0.5).active = true
     }
     
     override func didReceiveMemoryWarning() {

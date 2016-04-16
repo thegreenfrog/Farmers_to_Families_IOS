@@ -20,7 +20,7 @@ class ConsumerRegisterViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = Colors.lightBrown
+        self.view.backgroundColor = UIColor.clearColor()
         signInButton = UIButton(frame: Constants.buttonFrame)
         signInButton.backgroundColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
         signInButton.setTitle("Sign In", forState: .Normal)
@@ -29,8 +29,8 @@ class ConsumerRegisterViewController: UIViewController {
         
         signUpButton = UIButton(frame: Constants.buttonFrame)
         signUpButton.backgroundColor = UIColor.clearColor()
-        signUpButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
-        signUpButton.setTitle("Sign Up", forState: .Normal)
+        signUpButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        signUpButton.setTitle("Join Now", forState: .Normal)
         signUpButton.layer.masksToBounds = true
         signUpButton.translatesAutoresizingMaskIntoConstraints = false
         signUpButton.addTarget(self, action: "showSignUp", forControlEvents: .TouchUpInside)
