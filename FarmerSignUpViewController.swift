@@ -1,19 +1,18 @@
 //
-//  FarmerSignInViewController.swift
+//  FarmerSignUpViewController.swift
 //  LocalFarming
 //
-//  Created by Chris Lu on 4/13/16.
+//  Created by Chris Lu on 4/18/16.
 //  Copyright © 2016 Bowdoin College. All rights reserved.
 //
 
 import UIKit
 
-class FarmerSignInViewController: UIViewController {
-    
-    var signInButton: UIButton!
-    var exitButton: UIButton!
+class FarmerSignUpViewController: UIViewController {
     
     var modalListener: ModalFarmerTransitionListener?
+    
+    var exitButton: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,8 +27,6 @@ class FarmerSignInViewController: UIViewController {
         self.view.addSubview(exitButton)
         exitButton.topAnchor.constraintEqualToAnchor(self.view.topAnchor, constant: 50).active = true
         exitButton.trailingAnchor.constraintEqualToAnchor(self.view.trailingAnchor, constant: -12).active = true
-        
-        
     }
 
     override func didReceiveMemoryWarning() {
@@ -41,7 +38,6 @@ class FarmerSignInViewController: UIViewController {
         modalListener?.returnFromModal()
         self.dismissViewControllerAnimated(true, completion: nil)
     }
-    
 
     /*
     // MARK: - Navigation

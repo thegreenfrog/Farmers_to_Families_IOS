@@ -8,7 +8,11 @@
 
 import UIKit
 
-class FarmerRegisterViewController: UIViewController {
+protocol ModalFarmerTransitionListener {
+    func returnFromModal()
+}
+
+class FarmerRegisterViewController: UIViewController, ModalFarmerTransitionListener {
     
     struct Constants {
         static let buttonFrame:CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 200, height: 45))
@@ -18,13 +22,20 @@ class FarmerRegisterViewController: UIViewController {
     var signInButton: UIButton!
     var signUpButton: UIButton!
     
+    var signInVC: FarmerSignInViewController?
+    var signUpVC: FarmerSignUpViewController?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor.clearColor()
         
         signInButton = UIButton(frame: Constants.buttonFrame)
-        signInButton.backgroundColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
+        signInButton.backgroundColor = UIColor.clearColor()
+        signInButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        signInButton.titleLabel?.font = UIFont.systemFontOfSize(24)
+        signInButton.layer.borderColor = UIColor.whiteColor().CGColor
+        signInButton.layer.borderWidth = 1.0
         signInButton.setTitle("Sign In", forState: .Normal)
         signInButton.layer.masksToBounds = true
         signInButton.translatesAutoresizingMaskIntoConstraints = false
@@ -32,6 +43,7 @@ class FarmerRegisterViewController: UIViewController {
         
         signUpButton = UIButton(frame: Constants.buttonFrame)
         signUpButton.backgroundColor = UIColor.clearColor()
+        signUpButton.titleLabel?.font = UIFont.systemFontOfSize(20)
         signUpButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         signUpButton.setTitle("Sign Up", forState: .Normal)
         signUpButton.layer.masksToBounds = true
@@ -56,15 +68,27 @@ class FarmerRegisterViewController: UIViewController {
     }
     
     func showSignIn() {
-        let signInVC = ConsumerSignInViewController()
-        signInVC.modalTransitionStyle = .CoverVertical
-        presentViewController(signInVC, animated: true, completion: nil)
+        signInVC = FarmerSignInViewController()
+        signInVC!.modalTransitionStyle = .CoverVertical
+        signInVC!.modalPresentationStyle = .OverCurrentContext
+        signInVC!.modalListener = self
+        signUpButton.hidden = true
+        signInButton.hidden = true
+        presentViewController(signInVC!, animated: true, completion: nil)
     }
     
     func showSignUp() {
-        let signUpVC = ConsumerSignUpViewController()
-        signUpVC.modalTransitionStyle = .CoverVertical
-        presentViewController(signUpVC, animated: true, completion: nil)
+        signUpVC = FarmerSignUpViewController()
+        signUpVC!.modalTransitionStyle = .CoverVertical
+        signUpVC!.modalPresentationStyle = .OverCurrentContext
+        signUpVC!.modalListener = self
+        signUpButton.hidden = true
+        signInButton.hidden = true
+        presentViewController(signUpVC!, animated: true, completion: nil)
     }
 
+    func returnFromModal() {
+        signInButton.hidden = false
+        signUpButton.hidden = false
+    }
 }

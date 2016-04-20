@@ -24,6 +24,8 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
     
     let placeholders = ["First Name", "Last Name", "Username (email)", "Password", "Retype Password"]
     
+    var modalListener: ModalConsumerTransitionListener?
+    
     var exitButton: UIButton!
     var firstNameText: UITextField!
     var lastNameText: UITextField!
@@ -38,15 +40,17 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
     func drawScreen() {
         exitButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 75)))
         exitButton.setTitle("X", forState: .Normal)
-        exitButton.titleLabel!.font = UIFont.systemFontOfSize(30)
+        exitButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        exitButton.titleLabel!.font = UIFont.systemFontOfSize(24)
         exitButton.setTitleColor(UIColor.grayColor(), forState: .Normal)
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         exitButton.addTarget(self, action: "exitPage", forControlEvents: .TouchUpInside)
         
         firstNameText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         firstNameText.borderStyle = .Line
+        firstNameText.backgroundColor = UIColor(red: 54/255, green: 69/255, blue: 79/255, alpha: 0.8)
         firstNameText.tag = 0
-        firstNameText.font = UIFont.systemFontOfSize(30)
+        firstNameText.font = UIFont.systemFontOfSize(24)
         firstNameText.returnKeyType = UIReturnKeyType.Done
         firstNameText.text = placeholders[firstNameText.tag]
         firstNameText.textColor = UIColor.lightGrayColor()
@@ -55,8 +59,9 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         
         lastNameText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         lastNameText.borderStyle = .Line
+        lastNameText.backgroundColor = UIColor(red: 54/255, green: 69/255, blue: 79/255, alpha: 0.8)
         lastNameText.tag = 1
-        lastNameText.font = UIFont.systemFontOfSize(30)
+        lastNameText.font = UIFont.systemFontOfSize(24)
         lastNameText.returnKeyType = UIReturnKeyType.Done
         lastNameText.text = placeholders[lastNameText.tag]
         lastNameText.textColor = UIColor.lightGrayColor()
@@ -65,8 +70,9 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         
         emailText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         emailText.borderStyle = .Line
+        emailText.backgroundColor = UIColor(red: 54/255, green: 69/255, blue: 79/255, alpha: 0.8)
         emailText.tag = 2
-        emailText.font = UIFont.systemFontOfSize(30)
+        emailText.font = UIFont.systemFontOfSize(24)
         emailText.returnKeyType = UIReturnKeyType.Done
         emailText.text = placeholders[emailText.tag]
         emailText.textColor = UIColor.lightGrayColor()
@@ -75,8 +81,9 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         
         passText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         passText.borderStyle = .Line
+        passText.backgroundColor = UIColor(red: 54/255, green: 69/255, blue: 79/255, alpha: 0.8)
         passText.tag = 3
-        passText.font = UIFont.systemFontOfSize(30)
+        passText.font = UIFont.systemFontOfSize(24)
         passText.returnKeyType = UIReturnKeyType.Done
         passText.text = placeholders[passText.tag]
         passText.textColor = UIColor.lightGrayColor()
@@ -85,8 +92,9 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         
         retypePassText = UITextField(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
         retypePassText.borderStyle = .Line
+        retypePassText.backgroundColor = UIColor(red: 54/255, green: 69/255, blue: 79/255, alpha: 0.8)
         retypePassText.tag = 4
-        retypePassText.font = UIFont.systemFontOfSize(30)
+        retypePassText.font = UIFont.systemFontOfSize(24)
         retypePassText.returnKeyType = UIReturnKeyType.Done
         retypePassText.text = placeholders[retypePassText.tag]
         retypePassText.textColor = UIColor.lightGrayColor()
@@ -95,7 +103,9 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         
         signUpButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 75)))
         signUpButton.setTitle("Sign Up", forState: .Normal)
-        signUpButton.backgroundColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
+        signUpButton.backgroundColor = UIColor.clearColor()
+        signUpButton.titleLabel?.font = UIFont.systemFontOfSize(24)
+        signUpButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         signUpButton.translatesAutoresizingMaskIntoConstraints = false
         signUpButton.addTarget(self, action: "signUpAction", forControlEvents: .TouchUpInside)
         
@@ -127,7 +137,7 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
 
         drawScreen()
-        self.view.backgroundColor = Colors.lightBrown
+        self.view.backgroundColor = UIColor.clearColor()
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         view.addGestureRecognizer(tap)
     }
@@ -207,9 +217,10 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
                     NSUserDefaults.standardUserDefaults().setValue(self.emailText.text, forKey: "username")
                     NSUserDefaults.standardUserDefaults().synchronize()
                     
-                    //set up application
-                    let tabBarVC = ConsumerTabBarController()
-                    self.presentViewController(tabBarVC, animated: true, completion: nil)
+                    self.modalListener?.returnFromModal(true)
+                    self.dismissViewControllerAnimated(true, completion: {
+                        self.modalListener?.goToApp()
+                    })
                 }
             })
         }
@@ -217,6 +228,7 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
     }
     
     func exitPage() {
+        modalListener?.returnFromModal(false)
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
@@ -225,7 +237,7 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
     func textFieldDidBeginEditing(textField: UITextField) {
         if textField.textColor == UIColor.lightGrayColor() {
             textField.text = nil
-            textField.textColor = UIColor.blackColor()
+            textField.textColor = UIColor.whiteColor()
             if textField.tag == 3 || textField.tag == 4 {
                 textField.secureTextEntry = true
             }
