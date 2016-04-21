@@ -42,7 +42,6 @@ class ConsumerSignUpViewController: UIViewController, UITextFieldDelegate {
         exitButton.setTitle("X", forState: .Normal)
         exitButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         exitButton.titleLabel!.font = UIFont.systemFontOfSize(24)
-        exitButton.setTitleColor(UIColor.grayColor(), forState: .Normal)
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         exitButton.addTarget(self, action: "exitPage", forControlEvents: .TouchUpInside)
         
