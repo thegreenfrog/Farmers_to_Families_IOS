@@ -22,8 +22,8 @@ class FarmTableViewController: UITableViewController, UISearchResultsUpdating, U
         filteredProduceSearch = produce
         
         self.tableView.registerClass(FarmCell.self, forCellReuseIdentifier: NSStringFromClass(FarmCell))
-        self.tableView.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
-        self.navigationController?.navigationBar.barTintColor = UIColor(red: 34/255, green: 139/255, blue: 34/255, alpha: 1.0)
+        self.tableView.backgroundColor = UIColor.whiteColor()
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 54/255, green: 69/255, blue: 79/255, alpha: 1.0)
         
         searchController.searchResultsUpdater = self
         searchController.hidesNavigationBarDuringPresentation = false

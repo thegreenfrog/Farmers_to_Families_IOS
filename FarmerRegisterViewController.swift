@@ -9,7 +9,8 @@
 import UIKit
 
 protocol ModalFarmerTransitionListener {
-    func returnFromModal()
+    func returnFromModal(registered: Bool)
+    func goToApp()
 }
 
 class FarmerRegisterViewController: UIViewController, ModalFarmerTransitionListener {
@@ -87,8 +88,28 @@ class FarmerRegisterViewController: UIViewController, ModalFarmerTransitionListe
         presentViewController(signUpVC!, animated: true, completion: nil)
     }
 
-    func returnFromModal() {
-        signInButton.hidden = false
-        signUpButton.hidden = false
+    func returnFromModal(registered: Bool) {
+        if(registered) {
+            //show spinning wheel
+            let loadingIndicator = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+            loadingIndicator.userInteractionEnabled = false
+            loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+            loadingIndicator.startAnimating()
+            self.view.addSubview(loadingIndicator)
+            loadingIndicator.centerXAnchor.constraintEqualToAnchor(self.view.centerXAnchor).active = true
+            loadingIndicator.centerYAnchor.constraintEqualToAnchor(self.view.centerYAnchor).active = true
+            
+            
+        } else {
+            signInButton.hidden = false
+            signUpButton.hidden = false
+        }
+        
+    }
+    
+    func goToApp() {
+        //seque to main application
+        let tabBarVC = ConsumerTabBarController()
+        self.presentViewController(tabBarVC, animated: true, completion: nil)
     }
 }

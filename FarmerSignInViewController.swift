@@ -38,7 +38,7 @@ class FarmerSignInViewController: UIViewController {
     }
     
     func exitPage() {
-        modalListener?.returnFromModal()
+        modalListener?.returnFromModal(false)
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     

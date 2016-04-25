@@ -113,6 +113,7 @@ class ConsumerRegisterViewController: UIViewController, ModalConsumerTransitionL
     func goToApp() {
         //seque to main application
         let tabBarVC = ConsumerTabBarController()
+        tabBarVC.transitioningDelegate = self
         self.presentViewController(tabBarVC, animated: true, completion: nil)
     }
     
@@ -135,11 +136,6 @@ extension ConsumerRegisterViewController {
         presentingController presenting: UIViewController,
         sourceController source: UIViewController) ->
         UIViewControllerAnimatedTransitioning? {
-            transition.originFrame = self.view.frame
-            transition.presenting = true
             return transition
-    }
-    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return nil
     }
 }

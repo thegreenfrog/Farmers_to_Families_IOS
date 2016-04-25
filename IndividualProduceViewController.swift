@@ -195,8 +195,8 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         drawLabels()
         
         self.title = produce.name
-        self.navigationController?.navigationItem.rightBarButtonItem?.tintColor = UIColor.blackColor()
-        self.view.backgroundColor = UIColor(red: 205/255, green: 205/255, blue: 193/255, alpha: 1.0)
+        self.navigationController?.navigationItem.leftBarButtonItem?.tintColor = UIColor.whiteColor()
+        self.view.backgroundColor = UIColor.whiteColor()
         
         showQuantityStatus()
         

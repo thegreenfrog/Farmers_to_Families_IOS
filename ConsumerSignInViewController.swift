@@ -157,11 +157,18 @@ class ConsumerSignInViewController: UIViewController, UITextFieldDelegate {
     }
     
     func signInAction() {
+        self.modalListener?.returnFromModal(true)
+        self.dismissViewControllerAnimated(true, completion: {
+            self.modalListener?.goToApp()
+        })
+        return
+        
         checkForErrors()//check for improper inputs
         
         if(errorMessages.count > 0) {//show error messages if improper inputs exist
             handleErrors()
         } else {//attempt to log in
+            
             PFUser.logInWithUsernameInBackground(emailTextField.text!, password: passwordTextField.text!) {
                 (user: PFUser?, error: NSError?) -> Void in
                 if user != nil {
