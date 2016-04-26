@@ -15,12 +15,170 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
     var farmNameLabel: UILabel!
     var priceLabel: UILabel!
     var purchaseButton: UIButton!
-    var setPriceTextField: UITextField?
+    var setPriceTextField: UITextField!
     var produce: Produce!
+    
+    var screenStackView: UIStackView!
+    var scrollView: UIScrollView!
     
     struct Constants {
         static let textFieldFiller = "New Price"
     }
+    
+    
+    // MARK: Lifecycle
+    
+    func rendersetPriceTextFieldSettings() {
+        setPriceTextField = UITextField()
+        setPriceTextField?.alpha = 0.0
+        setPriceTextField!.placeholder = Constants.textFieldFiller
+        setPriceTextField!.textColor = UIColor.lightGrayColor()
+        setPriceTextField!.font = UIFont.systemFontOfSize(15)
+        setPriceTextField!.borderStyle = UITextBorderStyle.RoundedRect
+        setPriceTextField!.textAlignment = .Center
+        setPriceTextField!.autocorrectionType = UITextAutocorrectionType.No
+        setPriceTextField!.keyboardType = UIKeyboardType.Default
+        setPriceTextField!.returnKeyType = UIReturnKeyType.Done
+        setPriceTextField!.clearButtonMode = UITextFieldViewMode.WhileEditing;
+        setPriceTextField!.contentVerticalAlignment = UIControlContentVerticalAlignment.Center
+        setPriceTextField!.delegate = self
+        setPriceTextField.heightAnchor.constraintEqualToConstant(40).active = true
+    }
+    
+    func drawproduceImageView() {
+        produceImageView = UIImageView(frame: CGRect(origin: CGPointZero, size: CGSize(width: 200, height: 200)))
+        produceImageView.image = UIImage(named: "produce_placeholder.jpg")
+        produceImageView.layer.borderColor = Colors.woodColor.CGColor
+        produceImageView.layer.borderWidth = 2.0
+        produceImageView.layer.shadowColor = UIColor.blackColor().CGColor
+        produceImageView.layer.shadowOffset = CGSizeMake(0, 1)
+        produceImageView.layer.shadowOpacity = 1
+        produceImageView.layer.shadowRadius = 2.0
+        produceImageView.clipsToBounds = false
+    }
+    
+    func drawLabels() {
+        farmNameLabel = UILabel()
+        farmNameLabel.text = produce.farm
+        
+        priceLabel = UILabel()
+        priceLabel.text = "\(produce.price)"
+        priceLabel.numberOfLines = 0
+        priceLabel.textAlignment = .Center
+        
+        
+        rendersetPriceTextFieldSettings()
+        
+        purchaseButton = UIButton()
+        purchaseButton.setTitle("Buy a Unit", forState: .Normal)
+        purchaseButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        purchaseButton.addTarget(self, action: "buyUnitAction", forControlEvents: .TouchUpInside)
+        
+        drawproduceImageView()
+        
+        screenStackView = UIStackView()
+        screenStackView.addArrangedSubview(farmNameLabel)
+        screenStackView.addArrangedSubview(produceImageView)
+        screenStackView.addArrangedSubview(priceLabel)
+        screenStackView.addArrangedSubview(setPriceTextField)
+        screenStackView.addArrangedSubview(purchaseButton)
+        screenStackView.axis = .Vertical
+        screenStackView.alignment = .Center
+        screenStackView.distribution = .EqualSpacing
+        screenStackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        scrollView = UIScrollView()
+        scrollView.frame = self.view.bounds
+        
+        let contentView = UIView(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: self.view.frame.height)))
+        contentView.addSubview(screenStackView)
+        screenStackView.leadingAnchor.constraintEqualToAnchor(contentView.leadingAnchor).active = true
+        screenStackView.topAnchor.constraintEqualToAnchor(contentView.topAnchor).active = true
+        screenStackView.trailingAnchor.constraintEqualToAnchor(contentView.trailingAnchor).active = true
+        screenStackView.bottomAnchor.constraintEqualToAnchor(contentView.bottomAnchor).active = true
+        
+        scrollView.addSubview(contentView)
+        self.view.addSubview(scrollView)
+        scrollView.contentSize = CGSize(width: self.view.frame.width, height: self.view.frame.height)
+//        scrollView.leadingAnchor.constraintEqualToAnchor(self.view.leadingAnchor).active = true
+//        scrollView.trailingAnchor.constraintEqualToAnchor(self.view.trailingAnchor).active = true
+//        scrollView.topAnchor.constraintEqualToAnchor(self.view.topAnchor).active = true
+//        scrollView.bottomAnchor.constraintEqualToAnchor(self.view.bottomAnchor).active = true
+//        
+//        screenStackView.leadingAnchor.constraintEqualToAnchor(scrollView.leadingAnchor).active = true
+//        screenStackView.trailingAnchor.constraintEqualToAnchor(scrollView.trailingAnchor).active = true
+//        screenStackView.topAnchor.constraintEqualToAnchor(scrollView.topAnchor).active = true
+//        screenStackView.bottomAnchor.constraintEqualToAnchor(scrollView.bottomAnchor).active = true
+        //scrollView.contentSize = CGSize(width: self.view.frame.width, height: self.view.frame.height)
+
+        
+        
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let tap = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        self.view.addGestureRecognizer(tap)
+        
+        drawLabels()
+        
+        self.title = produce.name
+        self.navigationController?.navigationItem.leftBarButtonItem?.tintColor = UIColor.whiteColor()
+        self.view.backgroundColor = UIColor.whiteColor()
+
+    }
+    
+    override func viewDidLayoutSubviews()
+    {
+        super.viewDidLayoutSubviews()
+        let top = topLayoutGuide.length
+        let bottom = bottomLayoutGuide.length
+        
+
+//        self.scrollView.frame =  self.view.bounds
+//        self.scrollView.contentSize = CGSize(width: self.view.bounds.width, height: self.view.bounds.height)
+        
+        ///self.screenStackView.frame = CGRect(x: 0, y: 0, width: scrollView.contentSize.width, height: scrollView.contentSize.height)
+        //print(screenStackView.frame)
+        print(scrollView.contentSize)
+    }
+
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        let outBidLabel = UILabel()
+        outBidLabel.text = "All units have been bought. Bid a higher price to buy"
+        outBidLabel.textAlignment = .Center
+        outBidLabel.numberOfLines = 0
+        
+        if produce.quantity == 0 {
+            //swap
+            UIView.transitionWithView(self.priceLabel, duration: 1.0, options: .TransitionFlipFromLeft, animations: {
+                self.priceLabel.text = "All units have been bought. Bid a higher price to buy."
+                
+                }, completion: nil)
+            UIView.transitionWithView(self.setPriceTextField, duration: 1.0, options: .TransitionFlipFromLeft, animations: {
+                self.setPriceTextField.alpha = 1.0
+                }, completion: nil)
+            
+            
+        }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    init(p: Produce) {
+        super.init(nibName: nil, bundle: nil)
+        produce = p
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     
     // MARK: - Update Bag Functions
     
@@ -115,128 +273,7 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         updateBag()
     }
     
-    // MARK: Lifecycle
-    
-    func setTextFieldSettings(textFieldFrame: CGRect) {
-        setPriceTextField = UITextField(frame: textFieldFrame)
-        setPriceTextField!.placeholder = Constants.textFieldFiller
-        setPriceTextField!.textColor = UIColor.lightGrayColor()
-        setPriceTextField!.font = UIFont.systemFontOfSize(15)
-        setPriceTextField!.borderStyle = UITextBorderStyle.RoundedRect
-        setPriceTextField!.textAlignment = .Center
-        setPriceTextField!.autocorrectionType = UITextAutocorrectionType.No
-        setPriceTextField!.keyboardType = UIKeyboardType.Default
-        setPriceTextField!.returnKeyType = UIReturnKeyType.Done
-        setPriceTextField!.clearButtonMode = UITextFieldViewMode.WhileEditing;
-        setPriceTextField!.contentVerticalAlignment = UIControlContentVerticalAlignment.Center
-        setPriceTextField!.delegate = self
-        setPriceTextField!.center.x = self.view.center.x
-    }
-    
-    func showQuantityStatus() {
-//        if produce.quantity == 0 {
-//            quantityLabel.textColor = UIColor.redColor()
-//            quantityLabel.text = "Out of Stock"
-//        } else if produce.quantity > 3 {
-//            quantityLabel.textColor = UIColor.redColor()
-//            quantityLabel.text = "Low Stock"
-//        }
-    }
-    
-    func drawproduceImageView() {
-        produceImageView = UIImageView(frame: CGRect(origin: CGPointZero, size: CGSize(width: 200, height: 200)))
-        produceImageView.image = UIImage(named: "produce_placeholder.jpg")
-        produceImageView.layer.borderColor = Colors.woodColor.CGColor
-        produceImageView.layer.borderWidth = 2.0
-        produceImageView.layer.shadowColor = UIColor.blackColor().CGColor
-        produceImageView.layer.shadowOffset = CGSizeMake(0, 1)
-        produceImageView.layer.shadowOpacity = 1
-        produceImageView.layer.shadowRadius = 2.0
-        produceImageView.clipsToBounds = false
-    }
-    
-    func drawLabels() {
-        farmNameLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 75)))
-        farmNameLabel.text = produce.farm
-        
-        
-        priceLabel = UILabel(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 60)))
-        priceLabel.text = "\(produce.price)"
-        
-        self.view.addSubview(priceLabel)
-        
-        purchaseButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 60)))
-        purchaseButton.setTitle("Buy a Unit", forState: .Normal)
-        purchaseButton.addTarget(self, action: "buyUnitAction", forControlEvents: .TouchUpInside)
-        self.view.addSubview(purchaseButton)
 
-        drawproduceImageView()
-        let stack1 = UIStackView(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: self.view.frame.height)))
-        stack1.addArrangedSubview(farmNameLabel)
-        stack1.addArrangedSubview(produceImageView)
-        stack1.addArrangedSubview(priceLabel)
-        stack1.addArrangedSubview(purchaseButton)
-        stack1.axis = .Vertical
-        stack1.alignment = .Center
-        stack1.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(stack1)
-        let centerXConstraint = NSLayoutConstraint(item: stack1, attribute: .CenterX, relatedBy: .Equal, toItem: self.view, attribute: .CenterX, multiplier: 1, constant: 0)
-        let centerYConstraint = NSLayoutConstraint(item: stack1, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .CenterY, multiplier: 1, constant: 0)
-        self.view.addConstraint(centerXConstraint)
-        self.view.addConstraint(centerYConstraint)
-        
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        let tap = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
-        self.view.addGestureRecognizer(tap)
-        
-        drawLabels()
-        
-        self.title = produce.name
-        self.navigationController?.navigationItem.leftBarButtonItem?.tintColor = UIColor.whiteColor()
-        self.view.backgroundColor = UIColor.whiteColor()
-        
-        showQuantityStatus()
-        
-        if produce.price == 0 {
-            let labelFrame = CGRect(x: 0, y: self.view.bounds.height, width: self.view.bounds.width*2/3, height: 50)
-            let inputPriceLabel = UILabel(frame: labelFrame)
-            inputPriceLabel.numberOfLines = 0
-            inputPriceLabel.textAlignment = .Center
-            inputPriceLabel.center.x = self.view.center.x
-            inputPriceLabel.text = "All units have been bought. Bid a higher price to buy"
-            self.view.addSubview(inputPriceLabel)
-            let textFieldFrame = CGRect(x: 0, y: self.view.bounds.height + 50, width: self.view.bounds.width/3, height: 40)
-            setTextFieldSettings(textFieldFrame)
-            self.view.addSubview(setPriceTextField!)
-            //animate showing of both label and textfield
-            UIView.animateWithDuration(1.0,
-                delay: 0.0,
-                options: .TransitionCurlUp,
-                animations: {
-                    inputPriceLabel.center.y -= self.view.frame.height*5/12
-                    self.setPriceTextField!.center.y -= self.view.frame.height*5/12
-                },
-                completion: nil)
-        }
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    init(p: Produce) {
-        super.init(nibName: nil, bundle: nil)
-        produce = p
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - TextField functions
     
     func dismissKeyboard() {
@@ -244,8 +281,11 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldDidBeginEditing(textField: UITextField) {
-        textField.text = ""
-        textField.textColor = UIColor.blackColor()
+        if textField.textColor == UIColor.lightGrayColor() {
+            textField.text = ""
+            textField.textColor = UIColor.blackColor()
+        }
+        
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
