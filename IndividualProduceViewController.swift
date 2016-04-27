@@ -69,10 +69,12 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         
         rendersetPriceTextFieldSettings()
         
-        purchaseButton = UIButton()
+        purchaseButton = UIButton(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: 100)))
+        purchaseButton.backgroundColor = UIColor.grayColor()
         purchaseButton.setTitle("Buy a Unit", forState: .Normal)
         purchaseButton.setTitleColor(UIColor.blackColor(), forState: .Normal)
         purchaseButton.addTarget(self, action: "buyUnitAction", forControlEvents: .TouchUpInside)
+        purchaseButton.translatesAutoresizingMaskIntoConstraints = false
         
         drawproduceImageView()
         
@@ -81,16 +83,16 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         screenStackView.addArrangedSubview(produceImageView)
         screenStackView.addArrangedSubview(priceLabel)
         screenStackView.addArrangedSubview(setPriceTextField)
-        screenStackView.addArrangedSubview(purchaseButton)
+//        screenStackView.addArrangedSubview(purchaseButton)
         screenStackView.axis = .Vertical
         screenStackView.alignment = .Center
         screenStackView.distribution = .EqualSpacing
         screenStackView.translatesAutoresizingMaskIntoConstraints = false
         
         scrollView = UIScrollView()
-        scrollView.frame = self.view.bounds
+        scrollView.frame = CGRect(origin: CGPointZero, size: CGSize(width: self.view.bounds.width, height: self.view.bounds.height-60))
         
-        let contentView = UIView(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: self.view.frame.height)))
+        let contentView = UIView(frame: CGRect(origin: CGPointZero, size: CGSize(width: self.view.frame.width, height: self.view.frame.height-60)))
         contentView.addSubview(screenStackView)
         screenStackView.leadingAnchor.constraintEqualToAnchor(contentView.leadingAnchor).active = true
         screenStackView.topAnchor.constraintEqualToAnchor(contentView.topAnchor).active = true
@@ -99,7 +101,7 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         
         scrollView.addSubview(contentView)
         self.view.addSubview(scrollView)
-        scrollView.contentSize = CGSize(width: self.view.frame.width, height: self.view.frame.height)
+        scrollView.contentSize = CGSize(width: self.view.frame.width, height: self.view.frame.height-60)
 //        scrollView.leadingAnchor.constraintEqualToAnchor(self.view.leadingAnchor).active = true
 //        scrollView.trailingAnchor.constraintEqualToAnchor(self.view.trailingAnchor).active = true
 //        scrollView.topAnchor.constraintEqualToAnchor(self.view.topAnchor).active = true
@@ -111,7 +113,12 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
 //        screenStackView.bottomAnchor.constraintEqualToAnchor(scrollView.bottomAnchor).active = true
         //scrollView.contentSize = CGSize(width: self.view.frame.width, height: self.view.frame.height)
 
-        
+        self.view.addSubview(purchaseButton)
+        purchaseButton.leadingAnchor.constraintEqualToAnchor(self.view.leadingAnchor).active = true
+        purchaseButton.trailingAnchor.constraintEqualToAnchor(self.view.trailingAnchor).active = true
+        let tabBarHeight = 0 - (self.tabBarController?.tabBar.frame.height)!
+        purchaseButton.bottomAnchor.constraintEqualToAnchor(self.view.bottomAnchor, constant: tabBarHeight).active = true
+        purchaseButton.heightAnchor.constraintEqualToConstant(60).active = true
         
     }
     
