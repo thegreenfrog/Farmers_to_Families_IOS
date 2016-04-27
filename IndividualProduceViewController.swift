@@ -127,29 +127,12 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         self.view.backgroundColor = UIColor.whiteColor()
 
     }
-    
-    override func viewDidLayoutSubviews()
-    {
-        super.viewDidLayoutSubviews()
-        let top = topLayoutGuide.length
-        let bottom = bottomLayoutGuide.length
-        
-
-//        self.scrollView.frame =  self.view.bounds
-//        self.scrollView.contentSize = CGSize(width: self.view.bounds.width, height: self.view.bounds.height)
-        
-        ///self.screenStackView.frame = CGRect(x: 0, y: 0, width: scrollView.contentSize.width, height: scrollView.contentSize.height)
-        //print(screenStackView.frame)
-        print(scrollView.contentSize)
-    }
 
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        let outBidLabel = UILabel()
-        outBidLabel.text = "All units have been bought. Bid a higher price to buy"
-        outBidLabel.textAlignment = .Center
-        outBidLabel.numberOfLines = 0
+        
+        registerForKeyboardNotifications()
         
         if produce.quantity == 0 {
             //swap
@@ -160,9 +143,12 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
             UIView.transitionWithView(self.setPriceTextField, duration: 1.0, options: .TransitionFlipFromLeft, animations: {
                 self.setPriceTextField.alpha = 1.0
                 }, completion: nil)
-            
-            
         }
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        deregisterFromKeyboardNotifications()
     }
     
     override func didReceiveMemoryWarning() {
@@ -276,11 +262,14 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
 
     // MARK: - TextField functions
     
+    var activeField: UITextField?
+    
     func dismissKeyboard() {
-        view.endEditing(true)
+        activeField?.resignFirstResponder()
     }
     
     func textFieldDidBeginEditing(textField: UITextField) {
+        activeField = textField
         if textField.textColor == UIColor.lightGrayColor() {
             textField.text = ""
             textField.textColor = UIColor.blackColor()
@@ -289,6 +278,7 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
+        activeField = nil
         if textField.text == "" {
             textField.text = Constants.textFieldFiller
             textField.textColor = UIColor.lightGrayColor()
@@ -298,18 +288,56 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         updateBag()
-        print(textField.text)
         return true
     }
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    //register notification functions that shift scrollview when keyboard shows/hides
+    func registerForKeyboardNotifications() {
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWasShown:", name: UIKeyboardDidShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillBeHidden:", name: UIKeyboardWillHideNotification, object: nil)
     }
-    */
+    
+    //remove notification functions after leave this VC
+    func deregisterFromKeyboardNotifications() {
+        let center:  NSNotificationCenter = NSNotificationCenter.defaultCenter()
+        center.removeObserver(self, name: UIKeyboardDidShowNotification, object: nil)
+        center.removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+    }
+    
+    
+    // Called when the UIKeyboardDidShowNotification is sent.
+    func keyboardWasShown(notification: NSNotification) {
+        let info : NSDictionary = notification.userInfo!
+        if let keyboardSize = info.objectForKey(UIKeyboardFrameBeginUserInfoKey)?.CGRectValue.size {
+            let insets: UIEdgeInsets = UIEdgeInsetsMake(self.scrollView.contentInset.top, 0.0, keyboardSize.height, 0.0)
+            
+            self.scrollView.contentInset = insets
+            self.scrollView.scrollIndicatorInsets = insets
+
+            var visibleRect = self.view.frame
+            visibleRect.size.height -= keyboardSize.height
+            if let activeFieldPresent = activeField {
+                if !CGRectContainsPoint(visibleRect, activeFieldPresent.frame.origin) {
+                    let scrollPoint = CGPointMake(0.0, activeFieldPresent.frame.origin.y - keyboardSize.height)
+                    self.scrollView.scrollRectToVisible(activeFieldPresent.frame, animated: true)
+                }
+            }
+        }
+    }
+    
+    // Called when the UIKeyboardWillHideNotification is sent
+    func keyboardWillBeHidden(notification: NSNotification) {
+        //Once keyboard disappears, restore original positions
+        let info : NSDictionary = notification.userInfo!
+        print(scrollView.contentInset.top)
+        if let keyboardSize = info.objectForKey(UIKeyboardFrameBeginUserInfoKey)?.CGRectValue.size {
+            
+            let contentInsets : UIEdgeInsets = UIEdgeInsetsMake(self.scrollView.contentInset.top, 0.0, self.scrollView.contentInset.bottom - keyboardSize.height, 0.0)
+            self.scrollView.contentInset = contentInsets
+            self.scrollView.scrollIndicatorInsets = contentInsets
+        }
+        
+
+    }
 
 }

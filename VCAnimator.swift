@@ -10,7 +10,7 @@ import UIKit
 
 class VCAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
-    let duration = 2.0
+    let duration = 1.0
     
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning?)-> NSTimeInterval {
         return duration
