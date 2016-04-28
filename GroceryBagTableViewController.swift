@@ -55,20 +55,7 @@ class GroceryBagTableViewController: UITableViewController {
                 self.produceList = produce
             }
             
-            if self.produceList.count == 0 {//tell user that there is no produce in bag
-                let frame = CGRectMake(0, self.view.bounds.midY, self.view.bounds.width, 40)
-                self.noProduceLabel = UILabel(frame: frame)
-                self.noProduceLabel!.text = "No Produce in Bag"
-                self.noProduceLabel!.textAlignment = .Center
-                self.noProduceLabel!.textColor = UIColor.darkGrayColor()
-                self.view.addSubview(self.noProduceLabel!)
-            }
-            
             if(self.produceList.count > 0 && self.CheckoutButton == nil) {
-                if self.noProduceLabel != nil {//hide "no produce in bag" label if still showing
-                    self.noProduceLabel?.removeFromSuperview()
-                    self.noProduceLabel = nil
-                }
                 //show checkout button
                 self.CheckoutButton = UIButton()
                 self.CheckoutButton?.setTitle("Checkout", forState: .Normal)
@@ -295,7 +282,20 @@ class GroceryBagTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        if self.produceList.count == 0 {//tell user that there is no produce in bag
+            let frame = CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height)
+            noProduceLabel = UILabel(frame: frame)
+            noProduceLabel!.text = "No Produce in Bag"
+            noProduceLabel!.textAlignment = .Center
+            noProduceLabel!.textColor = UIColor.darkGrayColor()
+            noProduceLabel!.sizeToFit()
+            self.tableView.backgroundView = noProduceLabel
+            self.tableView.separatorStyle = .None
+            return 0
+        }
         // #warning Incomplete implementation, return the number of sections
+        self.tableView.backgroundView = nil
+        self.tableView.separatorStyle = .SingleLine
         return 1
     }
 

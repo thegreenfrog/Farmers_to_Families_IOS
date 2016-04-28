@@ -315,15 +315,14 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
     // Called when the UIKeyboardDidShowNotification is sent.
     func keyboardWasShown(notification: NSNotification) {
         let info : NSDictionary = notification.userInfo!
-        print("insets before: (\(self.scrollView.contentInset.top),\(self.scrollView.contentInset.bottom))")
+//        print("insets before: (\(self.scrollView.contentInset.top),\(self.scrollView.contentInset.bottom))")
         if let keyboardSize = info.objectForKey(UIKeyboardFrameBeginUserInfoKey)?.CGRectValue.size {
             let insets: UIEdgeInsets = UIEdgeInsetsMake(self.scrollView.contentInset.top, 0.0, self.scrollView.contentInset.bottom + keyboardSize.height, 0.0)
             
             self.scrollView.contentInset = insets
             self.scrollView.scrollIndicatorInsets = insets
             
-            print("insets before: (\(self.scrollView.contentInset.top),\(self.scrollView.contentInset.bottom))")
-            
+//            print("insets before: (\(self.scrollView.contentInset.top),\(self.scrollView.contentInset.bottom))")
             var visibleRect = self.view.frame
             visibleRect.size.height -= keyboardSize.height
             if let activeFieldPresent = activeField {
@@ -339,14 +338,14 @@ class IndividualProduceViewController: UIViewController, UITextFieldDelegate {
         //Once keyboard disappears, restore original positions
         let info : NSDictionary = notification.userInfo!
         
-        print("insets before: (\(self.scrollView.contentInset.top),\(self.scrollView.contentInset.bottom))")
+//        print("insets before: (\(self.scrollView.contentInset.top),\(self.scrollView.contentInset.bottom))")
         if let keyboardSize = info.objectForKey(UIKeyboardFrameBeginUserInfoKey)?.CGRectValue.size {
             
             let contentInsets : UIEdgeInsets = UIEdgeInsetsMake(self.scrollView.contentInset.top, 0.0, self.scrollView.contentInset.bottom - keyboardSize.height, 0.0)
             self.scrollView.contentInset = contentInsets
             self.scrollView.scrollIndicatorInsets = contentInsets
-            
-            print("insets before: (\(self.scrollView.contentInset.top),\(self.scrollView.contentInset.bottom))")
+//            
+//            print("insets before: (\(self.scrollView.contentInset.top),\(self.scrollView.contentInset.bottom))")
         }
         
 
