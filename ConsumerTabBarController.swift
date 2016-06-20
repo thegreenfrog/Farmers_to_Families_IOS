@@ -13,10 +13,12 @@ class ConsumerTabBarController: UITabBarController {
     init() {
         super.init(nibName: nil, bundle: nil)
         let farmNavVC = UINavigationController()
+        farmNavVC.navigationBar.barTintColor = Colors.headerFooterColor
         farmNavVC.tabBarItem = UITabBarItem(title: "Produce", image: UIImage(named: "Broccoli.png"), tag: 0)
         farmNavVC.pushViewController(FarmTableViewController(nibName: "FarmTableViewController", bundle: nil), animated: false)
         farmNavVC.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
         let profileNavVC = UINavigationController()
+        profileNavVC.navigationBar.barTintColor = Colors.headerFooterColor
         profileNavVC.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(named: "User.png"), tag: 1)
         profileNavVC.pushViewController(ProfileTableViewController(nibName: "ProfileTableViewController", bundle: nil), animated: false)
         let groceryNavVC = UINavigationController()
@@ -24,9 +26,8 @@ class ConsumerTabBarController: UITabBarController {
         groceryNavVC.pushViewController(GroceryBagTableViewController(nibName: "GroceryBagTableViewController", bundle: nil), animated: false)
         let VC = [farmNavVC, profileNavVC, groceryNavVC]
         self.viewControllers = VC
-        self.tabBar.tintColor = UIColor(red: 54/255, green: 69/255, blue: 79/255, alpha: 1.0)
         //UITabBarItem.appearance().setTitleTextAttributes([NSForegroundColorAttributeName: UIColor.grayColor()], forState: .Selected)
-        self.tabBar.barTintColor = UIColor.lightGrayColor()
+        //self.tabBar.barTintColor = Colors.headerFooterColor
         
     }
 

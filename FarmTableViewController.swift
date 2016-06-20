@@ -13,7 +13,7 @@ class FarmTableViewController: UITableViewController, UISearchResultsUpdating, U
 
     var produce = [Produce]()
     var filteredProduceSearch = [Produce]()
-
+    
     let searchController = UISearchController(searchResultsController: nil)
     
     override func viewDidLoad() {
@@ -23,14 +23,28 @@ class FarmTableViewController: UITableViewController, UISearchResultsUpdating, U
         
         self.tableView.registerClass(FarmCell.self, forCellReuseIdentifier: NSStringFromClass(FarmCell))
         self.tableView.backgroundColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.barTintColor = UIColor(red: 54/255, green: 69/255, blue: 79/255, alpha: 1.0)
         
         searchController.searchResultsUpdater = self
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.barTintColor = Colors.headerFooterColor
         searchController.searchBar.sizeToFit()
         definesPresentationContext = true
         self.tableView.tableHeaderView = searchController.searchBar
+        
+        let refresh = UIRefreshControl()
+        self.tableView.addSubview(refresh)
+        self.refreshControl = refresh
+//        self.refreshControl = UIRefreshControl(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: self.view.frame.width, height: 60)))
+        self.refreshControl?.addTarget(self, action: "refreshList:", forControlEvents: UIControlEvents.ValueChanged)
+        let searchTextField: UITextField? = searchController.searchBar.valueForKey("searchField") as? UITextField
+        let colorAttr = [NSForegroundColorAttributeName: UIColor.grayColor()]
+        searchTextField!.attributedPlaceholder = NSAttributedString(string: "What are you looking for?", attributes: colorAttr)
+        
+        searchController.searchBar.scopeButtonTitles = ["All", "Organic", "Non-Organic"]
+        searchController.searchBar.delegate = self
+        
+//        self.refreshControl?.attributedTitle = NSAttributedString(string: "Pull to Refresh")
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -99,6 +113,11 @@ class FarmTableViewController: UITableViewController, UISearchResultsUpdating, U
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func refreshList(refreshControl: UIRefreshControl) {
+        print("refresh ending")
+        self.refreshControl?.endRefreshing()
+    }
 
     // MARK: - Table view data source
 
@@ -109,7 +128,7 @@ class FarmTableViewController: UITableViewController, UISearchResultsUpdating, U
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        if searchController.active && searchController.searchBar.text != "" {
+        if searchController.active {
             return self.filteredProduceSearch.count
         } else {
             return self.produce.count
@@ -121,7 +140,11 @@ class FarmTableViewController: UITableViewController, UISearchResultsUpdating, U
         if(cell == nil) {
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: NSStringFromClass(FarmCell)) as? FarmCell
         }
-        if searchController.active && searchController.searchBar.text != "" {
+        if(searchController.active) {
+            print("active search controller")
+            print("search text: \(searchController.searchBar.text)")
+        }
+        if searchController.active {
             cell?.nameLabel.text = self.filteredProduceSearch[indexPath.row].name
         } else {
             cell?.nameLabel.text = self.produce[indexPath.row].name
@@ -178,18 +201,21 @@ class FarmTableViewController: UITableViewController, UISearchResultsUpdating, U
     */
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        filterContentForSearchText(searchController.searchBar.text!)
+        let searchBar = searchController.searchBar
+        let scope = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
+        filterContentForSearchText(searchController.searchBar.text!, scope: scope)
         tableView.reloadData()
     }
 
-    func filterContentForSearchText(searchText: String, scope: String = "All") {
+    func filterContentForSearchText(searchText: String, scope: String) {
         // Filter the array using the filter method
-        self.filteredProduceSearch = self.produce.filter({(prod: Produce) -> Bool in
+        self.filteredProduceSearch = self.produce.filter({ prod in
             let categoryMatch = (scope == "All") || (prod.category == scope)
-            let nameMatch = prod.name.lowercaseString.rangeOfString(searchText)
-            let farmMatch = prod.farm.lowercaseString.rangeOfString(searchText)
-            return ((nameMatch != nil) || (farmMatch != nil)) && categoryMatch
+            let nameMatch = prod.name.lowercaseString.containsString(searchText)
+            let farmMatch = prod.farm.lowercaseString.containsString(searchText)
+            return ((nameMatch || farmMatch) || searchText == "") && categoryMatch
         })
+        tableView.reloadData()
     }
     
     func searchBar(searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
